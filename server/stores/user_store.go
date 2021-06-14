@@ -1,6 +1,8 @@
 package stores
 
 import (
+	"fmt"
+
 	"github.com/ivanwang123/roadmap/server/graph/model"
 	"github.com/jmoiron/sqlx"
 )
@@ -31,5 +33,6 @@ func (s *UserStore) GetById(id int) (*model.User, error) {
 	if err := s.Get(&user, "SELECT * FROM users WHERE id = $1", id); err != nil {
 		return nil, err
 	}
+	fmt.Println("GET USER BY ID")
 	return &user, nil
 }

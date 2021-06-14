@@ -10,7 +10,7 @@ down:
 	migrate -database postgres://postgres:postgres@localhost/roadmap?sslmode=disable -path _db/migrations/ down
 
 force:
-	migrate -database postgres://postgres:postgres@localhost/roadmap?sslmode=disable -path _db/migrations/ force 1
+	migrate -database postgres://postgres:postgres@localhost/roadmap?sslmode=disable -path _db/migrations/ force 3
 
 generate:
 	go run github.com/99designs/gqlgen generate

@@ -2,18 +2,12 @@ package stores
 
 import (
 	"context"
-	"fmt"
 	"net/http"
-	"regexp"
-	"strings"
 
 	"github.com/jmoiron/sqlx"
 )
 
-var matchFirstCap = regexp.MustCompile("(.)([A-Z][a-z]+)")
-var matchAllCap = regexp.MustCompile("([a-z0-9])([A-Z])")
-
-var storeCtxKey = "store"
+const storeCtxKey = "store"
 
 type Store struct {
 	*UserStore
@@ -21,27 +15,12 @@ type Store struct {
 	*RoadmapStore
 }
 
-func NewStore(dbString string) (*Store, error) {
-	db, err := sqlx.Connect("pgx", dbString)
-	if err != nil {
-		return nil, fmt.Errorf("Error connecting to store: %w", err)
-	}
-
-	db.MapperFunc(func(s string) string {
-		return toSnakeCase(s)
-	})
-
+func NewStore(db *sqlx.DB) *Store {
 	return &Store{
 		UserStore:       &UserStore{DB: db},
 		CheckpointStore: &CheckpointStore{DB: db},
 		RoadmapStore:    &RoadmapStore{DB: db},
-	}, nil
-}
-
-func toSnakeCase(str string) string {
-	snake := matchFirstCap.ReplaceAllString(str, "${1}_${2}")
-	snake = matchAllCap.ReplaceAllString(snake, "${1}_${2}")
-	return strings.ToLower(snake)
+	}
 }
 
 func Middleware(store *Store) func(http.Handler) http.Handler {

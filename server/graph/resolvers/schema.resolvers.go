@@ -7,44 +7,38 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/ivanwang123/roadmap/server/dataloaders"
 	"github.com/ivanwang123/roadmap/server/graph/generated"
 	"github.com/ivanwang123/roadmap/server/graph/model"
 	"github.com/ivanwang123/roadmap/server/stores"
 )
 
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
-	store := stores.ForContext(ctx)
-	return store.UserStore.Create(&input)
+	return stores.ForContext(ctx).UserStore.Create(&input)
 }
 
 func (r *mutationResolver) CreateCheckpoint(ctx context.Context, input model.NewCheckpoint) (*model.Checkpoint, error) {
-	store := stores.ForContext(ctx)
-	return store.CheckpointStore.Create(&input)
+	return stores.ForContext(ctx).CheckpointStore.Create(&input)
 }
 
 func (r *mutationResolver) CreateRoadmap(ctx context.Context, input model.NewRoadmap) (*model.Roadmap, error) {
-	store := stores.ForContext(ctx)
-	return store.RoadmapStore.Create(&input)
+	return stores.ForContext(ctx).RoadmapStore.Create(&input)
 }
 
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
-	store := stores.ForContext(ctx)
-	return store.UserStore.GetAll()
+	return stores.ForContext(ctx).UserStore.GetAll()
 }
 
 func (r *queryResolver) Roadmaps(ctx context.Context) ([]*model.Roadmap, error) {
-	store := stores.ForContext(ctx)
-	return store.RoadmapStore.GetAll()
+	return stores.ForContext(ctx).RoadmapStore.GetAll()
 }
 
 func (r *roadmapResolver) Creator(ctx context.Context, obj *model.Roadmap) (*model.User, error) {
-	store := stores.ForContext(ctx)
-	return store.UserStore.GetById(obj.CreatorID)
+	return dataloaders.ForContext(ctx).UserById.Load(obj.CreatorID)
 }
 
 func (r *roadmapResolver) Checkpoints(ctx context.Context, obj *model.Roadmap) ([]*model.Checkpoint, error) {
-	store := stores.ForContext(ctx)
-	return store.CheckpointStore.GetByRoadmap(obj.ID)
+	return stores.ForContext(ctx).CheckpointStore.GetByRoadmap(obj.ID)
 }
 
 func (r *roadmapResolver) Followers(ctx context.Context, obj *model.Roadmap) ([]*model.RoadmapFollower, error) {
@@ -52,8 +46,7 @@ func (r *roadmapResolver) Followers(ctx context.Context, obj *model.Roadmap) ([]
 }
 
 func (r *roadmapFollowerResolver) User(ctx context.Context, obj *model.RoadmapFollower) (*model.User, error) {
-	store := stores.ForContext(ctx)
-	return store.UserStore.GetById(obj.UserID)
+	return stores.ForContext(ctx).UserStore.GetById(obj.UserID)
 }
 
 func (r *roadmapFollowerResolver) Roadmap(ctx context.Context, obj *model.RoadmapFollower) (*model.Roadmap, error) {
