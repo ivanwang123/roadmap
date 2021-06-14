@@ -1,15 +1,46 @@
-import Link from "next/link";
 import Layout from "../components/Layout";
+import { gql } from "@apollo/client";
+import { getApolloClient } from "../apollo-client";
+import { InferGetStaticPropsType } from "next";
 
-const IndexPage = () => (
-  <Layout title="Home | Next.js + TypeScript Example">
-    <h1 className="font-bold text-coolGray-500">Hello Next.js 👋</h1>
-    <p>
-      <Link href="/about">
-        <a>About</a>
-      </Link>
-    </p>
-  </Layout>
-);
+function Home({ users }: InferGetStaticPropsType<typeof getStaticProps>) {
+  return (
+    <Layout title="Home | Roadmap">
+      <h1 className="font-bold text-emerald-500">Roadmap</h1>
+      <div>
+        {users.map((user: any) => (
+          <div key={user.id}>
+            <h3>{user.id}</h3>
+            <p>
+              {user.username} - {user.email}
+            </p>
+          </div>
+        ))}
+      </div>
+    </Layout>
+  );
+}
 
-export default IndexPage;
+export const getStaticProps = async () => {
+  const client = getApolloClient();
+
+  const { data } = await client.query({
+    query: gql`
+      query Users {
+        users {
+          id
+          username
+          email
+        }
+      }
+    `,
+  });
+
+  return {
+    props: {
+      users: data.users.slice(0, 4),
+    },
+  };
+};
+
+export default Home;
