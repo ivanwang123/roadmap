@@ -1,0 +1,18 @@
+# QUERIES
+
+type Query {
+  oneUser(input: GetUser): User!
+  oneRoadmap(input: GetRoadmap): Roadmap!
+  allUsers: [User!]!
+  allRoadmaps: [Roadmap!]!
+}
+
+# INPUTS
+
+input GetUser {
+  userId: Int!
+}
+
+input GetRoadmap {
+  roadmapId: Int!
+}

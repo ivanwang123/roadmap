@@ -1,0 +1,10 @@
+type Roadmap {
+  id: ID!
+  title: String!
+  description: String!
+  creator: User!
+  checkpoints: [Checkpoint!]!
+  followers: [RoadmapFollower!]!
+  createdAt: Time!
+  updatedAt: Time!
+}

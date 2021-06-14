@@ -16,7 +16,7 @@ generate:
 	go run github.com/99designs/gqlgen generate
 
 dataloader:
-	go run github.com/vektah/dataloaden UserLoader int *github.com/ivanwang123/roadmap/server/graph/model.User
+	go run github.com/vektah/dataloaden RoadmapFollowerLoader int *github.com/ivanwang123/roadmap/server/graph/model.RoadmapFollower
 
 air:
 	air -c .air.toml

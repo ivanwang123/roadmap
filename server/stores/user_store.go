@@ -28,6 +28,7 @@ func (s *UserStore) GetAll() ([]*model.User, error) {
 	return users, nil
 }
 
+// TODO: Deprecated?
 func (s *UserStore) GetById(id int) (*model.User, error) {
 	var user model.User
 	if err := s.Get(&user, "SELECT * FROM users WHERE id = $1", id); err != nil {

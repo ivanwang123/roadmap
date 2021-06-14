@@ -2,19 +2,21 @@
 
 package model
 
-import (
-	"time"
-)
+type AddCheckpoint struct {
+	RoadmapID    int `json:"roadmapId"`
+	CheckpointID int `json:"checkpointId"`
+}
 
-type Checkpoint struct {
-	ID           int       `json:"id"`
-	Title        string    `json:"title"`
-	Instructions string    `json:"instructions"`
-	Links        []string  `json:"links"`
-	IsCompleted  *bool     `json:"isCompleted"`
-	Roadmap      *Roadmap  `json:"roadmap"`
-	CreatedAt    time.Time `json:"createdAt"`
-	UpdatedAt    time.Time `json:"updatedAt"`
+type FollowRoadmap struct {
+	RoadmapID int `json:"roadmapId"`
+}
+
+type GetRoadmap struct {
+	RoadmapID int `json:"roadmapId"`
+}
+
+type GetUser struct {
+	UserID int `json:"userId"`
 }
 
 type NewCheckpoint struct {
@@ -33,15 +35,4 @@ type NewUser struct {
 	Username string `json:"username"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
-}
-
-type User struct {
-	ID                int        `json:"id"`
-	Username          string     `json:"username"`
-	Email             string     `json:"email"`
-	Password          string     `json:"password"`
-	FollowingRoadmaps []*Roadmap `json:"followingRoadmaps"`
-	CreatedRoadmaps   []*Roadmap `json:"createdRoadmaps"`
-	CreatedAt         time.Time  `json:"createdAt"`
-	UpdatedAt         time.Time  `json:"updatedAt"`
 }

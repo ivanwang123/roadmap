@@ -1,0 +1,10 @@
+type Checkpoint {
+  id: ID!
+  title: String!
+  instructions: String!
+  links: [String!]!
+  isCompleted: Boolean
+  roadmap: Roadmap!
+  createdAt: Time!
+  updatedAt: Time!
+}

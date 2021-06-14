@@ -1,0 +1,38 @@
+# MUTATIONS
+
+type Mutation {
+  createUser(input: NewUser!): User!
+  createCheckpoint(input: NewCheckpoint!): Checkpoint!
+  createRoadmap(input: NewRoadmap!): Roadmap!
+  followRoadmap(input: FollowRoadmap!): User!
+  addCheckpoint(input: AddCheckpoint!): Checkpoint!
+}
+
+# INPUTS
+
+input NewUser {
+  username: String!
+  email: String!
+  password: String!
+}
+
+input NewCheckpoint {
+  title: String!
+  instructions: String!
+  roadmapId: Int!
+}
+
+input NewRoadmap {
+  title: String!
+  description: String!
+  creatorId: Int!
+}
+
+input FollowRoadmap {
+  roadmapId: Int!
+}
+
+input AddCheckpoint {
+  roadmapId: Int!
+  checkpointId: Int!
+}

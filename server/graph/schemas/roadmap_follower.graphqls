@@ -1,0 +1,5 @@
+type RoadmapFollower {
+  id: ID!
+  user: User!
+  roadmap: Roadmap!
+}
