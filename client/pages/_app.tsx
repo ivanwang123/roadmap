@@ -13,7 +13,7 @@ function App({ Component, pageProps }: AppProps) {
       <Auth0Provider
         domain="dev-jkn4emz6.us.auth0.com"
         clientId="2El7qcsqxaGzhb6ys9SME8Ofxdcvst34"
-        redirectUri="http://localhost:3000/private"
+        redirectUri="https://roadmapper.vercel.app/private"
         audience="https://dev-jkn4emz6.us.auth0.com/api/v2/"
         // scope={auth0Config.scope}
       >
