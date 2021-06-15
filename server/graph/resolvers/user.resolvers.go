@@ -5,18 +5,21 @@ package resolvers
 
 import (
 	"context"
-	"fmt"
 
+	"github.com/ivanwang123/roadmap/server/dataloaders"
 	"github.com/ivanwang123/roadmap/server/graph/generated"
 	"github.com/ivanwang123/roadmap/server/graph/model"
+	"github.com/ivanwang123/roadmap/server/stores"
 )
 
 func (r *userResolver) FollowingRoadmaps(ctx context.Context, obj *model.User) ([]*model.Roadmap, error) {
-	panic(fmt.Errorf("not implemented"))
+	return dataloaders.ForContext(ctx).RoadmapByFollower.Load(obj.ID)
+	// return stores.ForContext(ctx).RoadmapFollowerStore.GetByUserId(obj.ID)
 }
 
 func (r *userResolver) CreatedRoadmaps(ctx context.Context, obj *model.User) ([]*model.Roadmap, error) {
-	panic(fmt.Errorf("not implemented"))
+	return stores.ForContext(ctx).RoadmapStore.GetByCreatorId(obj.ID)
+	// return dataloaders.ForContext(ctx).RoadmapByCreatorId.Load(obj.ID)
 }
 
 // User returns generated.UserResolver implementation.

@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS roadmaps (
 
 CREATE TRIGGER revise_roadmap_updated_at BEFORE UPDATE ON roadmaps FOR EACH ROW EXECUTE PROCEDURE revise_updated_at();
 
-CREATE TABLE IF NOT EXISTS roadmap_follower (
+CREATE TABLE IF NOT EXISTS roadmap_followers (
   user_id INT NOT NULL REFERENCES users(id),
   roadmap_id INT NOT NULL REFERENCES roadmaps(id),
   PRIMARY KEY (user_id, roadmap_id)

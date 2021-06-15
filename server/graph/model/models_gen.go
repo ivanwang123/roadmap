@@ -2,12 +2,8 @@
 
 package model
 
-type AddCheckpoint struct {
-	RoadmapID    int `json:"roadmapId"`
-	CheckpointID int `json:"checkpointId"`
-}
-
 type FollowRoadmap struct {
+	UserID    int `json:"userId"`
 	RoadmapID int `json:"roadmapId"`
 }
 
@@ -17,6 +13,12 @@ type GetRoadmap struct {
 
 type GetUser struct {
 	UserID int `json:"userId"`
+}
+
+type Login struct {
+	Username *string `json:"username"`
+	Email    *string `json:"email"`
+	Password string  `json:"password"`
 }
 
 type NewCheckpoint struct {

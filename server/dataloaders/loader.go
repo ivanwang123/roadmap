@@ -11,20 +11,20 @@ import (
 const loaderCtxKey = "dataloader"
 
 type Loader struct {
-	UserById                   *UserLoader
-	RoadmapById                *RoadmapLoader
-	RoadmapFollowerByUserId    *RoadmapFollowerLoader
-	RoadmapFollowerByRoadmapId *RoadmapFollowerLoader
+	UserById               *UserLoader
+	UserByRoadmapFollowing *UserRoadmapFollowingLoader
+	RoadmapById            *RoadmapLoader
+	RoadmapByFollower      *RoadmapFollowerLoader
 }
 
 func Middleware(db *sqlx.DB) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx := context.WithValue(r.Context(), loaderCtxKey, &Loader{
-				UserById:                   UserById(db),
-				RoadmapById:                RoadmapById(db),
-				RoadmapFollowerByUserId:    RoadmapFollowerByUserId(db),
-				RoadmapFollowerByRoadmapId: RoadmapFollowerByRoadmapId(db),
+				UserById:               UserById(db),
+				UserByRoadmapFollowing: UserByRoadmapFollowing(db),
+				RoadmapById:            RoadmapById(db),
+				RoadmapByFollower:      RoadmapByFollower(db),
 			})
 
 			r = r.WithContext(ctx)

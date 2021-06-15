@@ -4,7 +4,7 @@ type Roadmap {
   description: String!
   creator: User!
   checkpoints: [Checkpoint!]!
-  followers: [RoadmapFollower!]!
+  followers: [User!]!
   createdAt: Time!
   updatedAt: Time!
 }

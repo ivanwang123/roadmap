@@ -13,13 +13,15 @@ type Store struct {
 	*UserStore
 	*CheckpointStore
 	*RoadmapStore
+	*RoadmapFollowerStore
 }
 
 func NewStore(db *sqlx.DB) *Store {
 	return &Store{
-		UserStore:       &UserStore{DB: db},
-		CheckpointStore: &CheckpointStore{DB: db},
-		RoadmapStore:    &RoadmapStore{DB: db},
+		UserStore:            &UserStore{DB: db},
+		CheckpointStore:      &CheckpointStore{DB: db},
+		RoadmapStore:         &RoadmapStore{DB: db},
+		RoadmapFollowerStore: &RoadmapFollowerStore{DB: db},
 	}
 }
 

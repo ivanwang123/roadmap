@@ -1,8 +1,6 @@
 package stores
 
 import (
-	"fmt"
-
 	"github.com/ivanwang123/roadmap/server/graph/model"
 	"github.com/jmoiron/sqlx"
 )
@@ -25,6 +23,21 @@ func (s *RoadmapStore) GetAll() ([]*model.Roadmap, error) {
 	if err := s.Select(&roadmaps, "SELECT * FROM roadmaps"); err != nil {
 		return []*model.Roadmap{}, err
 	}
-	fmt.Println("GET ALL ROADMAPS", roadmaps)
+	return roadmaps, nil
+}
+
+func (s *RoadmapStore) GetById(id int) (*model.Roadmap, error) {
+	var roadmap model.Roadmap
+	if err := s.Get(&roadmap, "SELECT * FROM roadmaps WHERE id = $1", id); err != nil {
+		return nil, err
+	}
+	return &roadmap, nil
+}
+
+func (s *RoadmapStore) GetByCreatorId(creatorId int) ([]*model.Roadmap, error) {
+	roadmaps := []*model.Roadmap{}
+	if err := s.Select(&roadmaps, "SELECT * FROM roadmaps WHERE creator_id = $1", creatorId); err != nil {
+		return []*model.Roadmap{}, err
+	}
 	return roadmaps, nil
 }

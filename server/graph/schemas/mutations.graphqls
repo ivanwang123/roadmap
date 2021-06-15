@@ -4,8 +4,8 @@ type Mutation {
   createUser(input: NewUser!): User!
   createCheckpoint(input: NewCheckpoint!): Checkpoint!
   createRoadmap(input: NewRoadmap!): Roadmap!
-  followRoadmap(input: FollowRoadmap!): User!
-  addCheckpoint(input: AddCheckpoint!): Checkpoint!
+  login(input: Login!): String!
+  toggleFollowRoadmap(input: FollowRoadmap!): Boolean!
 }
 
 # INPUTS
@@ -29,10 +29,12 @@ input NewRoadmap {
 }
 
 input FollowRoadmap {
+  userId: Int!
   roadmapId: Int!
 }
 
-input AddCheckpoint {
-  roadmapId: Int!
-  checkpointId: Int!
+input Login {
+  username: String
+  email: String
+  password: String!
 }

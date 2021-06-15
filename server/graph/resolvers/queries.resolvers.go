@@ -5,7 +5,6 @@ package resolvers
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/ivanwang123/roadmap/server/graph/generated"
 	"github.com/ivanwang123/roadmap/server/graph/model"
@@ -17,7 +16,7 @@ func (r *queryResolver) OneUser(ctx context.Context, input *model.GetUser) (*mod
 }
 
 func (r *queryResolver) OneRoadmap(ctx context.Context, input *model.GetRoadmap) (*model.Roadmap, error) {
-	panic(fmt.Errorf("not implemented"))
+	return stores.ForContext(ctx).RoadmapStore.GetById(input.RoadmapID)
 }
 
 func (r *queryResolver) AllUsers(ctx context.Context) ([]*model.User, error) {
@@ -25,7 +24,6 @@ func (r *queryResolver) AllUsers(ctx context.Context) ([]*model.User, error) {
 }
 
 func (r *queryResolver) AllRoadmaps(ctx context.Context) ([]*model.Roadmap, error) {
-	fmt.Println("ALL ROADMAPS RESOLVER")
 	return stores.ForContext(ctx).RoadmapStore.GetAll()
 }
 

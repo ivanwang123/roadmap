@@ -5,8 +5,8 @@ package resolvers
 
 import (
 	"context"
-	"fmt"
 
+	"github.com/ivanwang123/roadmap/server/auth"
 	"github.com/ivanwang123/roadmap/server/graph/generated"
 	"github.com/ivanwang123/roadmap/server/graph/model"
 	"github.com/ivanwang123/roadmap/server/stores"
@@ -24,12 +24,22 @@ func (r *mutationResolver) CreateRoadmap(ctx context.Context, input model.NewRoa
 	return stores.ForContext(ctx).RoadmapStore.Create(&input)
 }
 
-func (r *mutationResolver) FollowRoadmap(ctx context.Context, input model.FollowRoadmap) (*model.User, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *mutationResolver) Login(ctx context.Context, input model.Login) (string, error) {
+	id, err := stores.ForContext(ctx).UserStore.Authenticate(&input)
+	if err != nil {
+		return "", err
+	}
+
+	token, err := auth.GenerateToken(id)
+	if err != nil {
+		return "", err
+	}
+
+	return token, nil
 }
 
-func (r *mutationResolver) AddCheckpoint(ctx context.Context, input model.AddCheckpoint) (*model.Checkpoint, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *mutationResolver) ToggleFollowRoadmap(ctx context.Context, input model.FollowRoadmap) (bool, error) {
+	return stores.ForContext(ctx).RoadmapFollowerStore.ToggleFollowRoadmap(&input)
 }
 
 // Mutation returns generated.MutationResolver implementation.

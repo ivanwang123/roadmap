@@ -9,10 +9,10 @@ import (
 	"github.com/ivanwang123/roadmap/server/graph/model"
 )
 
-// RoadmapFollowerLoaderConfig captures the config to create a new RoadmapFollowerLoader
-type RoadmapFollowerLoaderConfig struct {
+// UserRoadmapFollowingLoaderConfig captures the config to create a new UserRoadmapFollowingLoader
+type UserRoadmapFollowingLoaderConfig struct {
 	// Fetch is a method that provides the data for the loader
-	Fetch func(keys []int) ([][]*model.Roadmap, []error)
+	Fetch func(keys []int) ([][]*model.User, []error)
 
 	// Wait is how long wait before sending a batch
 	Wait time.Duration
@@ -21,19 +21,19 @@ type RoadmapFollowerLoaderConfig struct {
 	MaxBatch int
 }
 
-// NewRoadmapFollowerLoader creates a new RoadmapFollowerLoader given a fetch, wait, and maxBatch
-func NewRoadmapFollowerLoader(config RoadmapFollowerLoaderConfig) *RoadmapFollowerLoader {
-	return &RoadmapFollowerLoader{
+// NewUserRoadmapFollowingLoader creates a new UserRoadmapFollowingLoader given a fetch, wait, and maxBatch
+func NewUserRoadmapFollowingLoader(config UserRoadmapFollowingLoaderConfig) *UserRoadmapFollowingLoader {
+	return &UserRoadmapFollowingLoader{
 		fetch:    config.Fetch,
 		wait:     config.Wait,
 		maxBatch: config.MaxBatch,
 	}
 }
 
-// RoadmapFollowerLoader batches and caches requests
-type RoadmapFollowerLoader struct {
+// UserRoadmapFollowingLoader batches and caches requests
+type UserRoadmapFollowingLoader struct {
 	// this method provides the data for the loader
-	fetch func(keys []int) ([][]*model.Roadmap, []error)
+	fetch func(keys []int) ([][]*model.User, []error)
 
 	// how long to done before sending a batch
 	wait time.Duration
@@ -44,51 +44,51 @@ type RoadmapFollowerLoader struct {
 	// INTERNAL
 
 	// lazily created cache
-	cache map[int][]*model.Roadmap
+	cache map[int][]*model.User
 
 	// the current batch. keys will continue to be collected until timeout is hit,
 	// then everything will be sent to the fetch method and out to the listeners
-	batch *roadmapFollowerLoaderBatch
+	batch *userRoadmapFollowingLoaderBatch
 
 	// mutex to prevent races
 	mu sync.Mutex
 }
 
-type roadmapFollowerLoaderBatch struct {
+type userRoadmapFollowingLoaderBatch struct {
 	keys    []int
-	data    [][]*model.Roadmap
+	data    [][]*model.User
 	error   []error
 	closing bool
 	done    chan struct{}
 }
 
-// Load a Roadmap by key, batching and caching will be applied automatically
-func (l *RoadmapFollowerLoader) Load(key int) ([]*model.Roadmap, error) {
+// Load a User by key, batching and caching will be applied automatically
+func (l *UserRoadmapFollowingLoader) Load(key int) ([]*model.User, error) {
 	return l.LoadThunk(key)()
 }
 
-// LoadThunk returns a function that when called will block waiting for a Roadmap.
+// LoadThunk returns a function that when called will block waiting for a User.
 // This method should be used if you want one goroutine to make requests to many
 // different data loaders without blocking until the thunk is called.
-func (l *RoadmapFollowerLoader) LoadThunk(key int) func() ([]*model.Roadmap, error) {
+func (l *UserRoadmapFollowingLoader) LoadThunk(key int) func() ([]*model.User, error) {
 	l.mu.Lock()
 	if it, ok := l.cache[key]; ok {
 		l.mu.Unlock()
-		return func() ([]*model.Roadmap, error) {
+		return func() ([]*model.User, error) {
 			return it, nil
 		}
 	}
 	if l.batch == nil {
-		l.batch = &roadmapFollowerLoaderBatch{done: make(chan struct{})}
+		l.batch = &userRoadmapFollowingLoaderBatch{done: make(chan struct{})}
 	}
 	batch := l.batch
 	pos := batch.keyIndex(l, key)
 	l.mu.Unlock()
 
-	return func() ([]*model.Roadmap, error) {
+	return func() ([]*model.User, error) {
 		<-batch.done
 
-		var data []*model.Roadmap
+		var data []*model.User
 		if pos < len(batch.data) {
 			data = batch.data[pos]
 		}
@@ -113,49 +113,49 @@ func (l *RoadmapFollowerLoader) LoadThunk(key int) func() ([]*model.Roadmap, err
 
 // LoadAll fetches many keys at once. It will be broken into appropriate sized
 // sub batches depending on how the loader is configured
-func (l *RoadmapFollowerLoader) LoadAll(keys []int) ([][]*model.Roadmap, []error) {
-	results := make([]func() ([]*model.Roadmap, error), len(keys))
+func (l *UserRoadmapFollowingLoader) LoadAll(keys []int) ([][]*model.User, []error) {
+	results := make([]func() ([]*model.User, error), len(keys))
 
 	for i, key := range keys {
 		results[i] = l.LoadThunk(key)
 	}
 
-	roadmaps := make([][]*model.Roadmap, len(keys))
+	users := make([][]*model.User, len(keys))
 	errors := make([]error, len(keys))
 	for i, thunk := range results {
-		roadmaps[i], errors[i] = thunk()
+		users[i], errors[i] = thunk()
 	}
-	return roadmaps, errors
+	return users, errors
 }
 
-// LoadAllThunk returns a function that when called will block waiting for a Roadmaps.
+// LoadAllThunk returns a function that when called will block waiting for a Users.
 // This method should be used if you want one goroutine to make requests to many
 // different data loaders without blocking until the thunk is called.
-func (l *RoadmapFollowerLoader) LoadAllThunk(keys []int) func() ([][]*model.Roadmap, []error) {
-	results := make([]func() ([]*model.Roadmap, error), len(keys))
+func (l *UserRoadmapFollowingLoader) LoadAllThunk(keys []int) func() ([][]*model.User, []error) {
+	results := make([]func() ([]*model.User, error), len(keys))
 	for i, key := range keys {
 		results[i] = l.LoadThunk(key)
 	}
-	return func() ([][]*model.Roadmap, []error) {
-		roadmaps := make([][]*model.Roadmap, len(keys))
+	return func() ([][]*model.User, []error) {
+		users := make([][]*model.User, len(keys))
 		errors := make([]error, len(keys))
 		for i, thunk := range results {
-			roadmaps[i], errors[i] = thunk()
+			users[i], errors[i] = thunk()
 		}
-		return roadmaps, errors
+		return users, errors
 	}
 }
 
 // Prime the cache with the provided key and value. If the key already exists, no change is made
 // and false is returned.
 // (To forcefully prime the cache, clear the key first with loader.clear(key).prime(key, value).)
-func (l *RoadmapFollowerLoader) Prime(key int, value []*model.Roadmap) bool {
+func (l *UserRoadmapFollowingLoader) Prime(key int, value []*model.User) bool {
 	l.mu.Lock()
 	var found bool
 	if _, found = l.cache[key]; !found {
 		// make a copy when writing to the cache, its easy to pass a pointer in from a loop var
 		// and end up with the whole cache pointing to the same value.
-		cpy := make([]*model.Roadmap, len(value))
+		cpy := make([]*model.User, len(value))
 		copy(cpy, value)
 		l.unsafeSet(key, cpy)
 	}
@@ -164,22 +164,22 @@ func (l *RoadmapFollowerLoader) Prime(key int, value []*model.Roadmap) bool {
 }
 
 // Clear the value at key from the cache, if it exists
-func (l *RoadmapFollowerLoader) Clear(key int) {
+func (l *UserRoadmapFollowingLoader) Clear(key int) {
 	l.mu.Lock()
 	delete(l.cache, key)
 	l.mu.Unlock()
 }
 
-func (l *RoadmapFollowerLoader) unsafeSet(key int, value []*model.Roadmap) {
+func (l *UserRoadmapFollowingLoader) unsafeSet(key int, value []*model.User) {
 	if l.cache == nil {
-		l.cache = map[int][]*model.Roadmap{}
+		l.cache = map[int][]*model.User{}
 	}
 	l.cache[key] = value
 }
 
 // keyIndex will return the location of the key in the batch, if its not found
 // it will add the key to the batch
-func (b *roadmapFollowerLoaderBatch) keyIndex(l *RoadmapFollowerLoader, key int) int {
+func (b *userRoadmapFollowingLoaderBatch) keyIndex(l *UserRoadmapFollowingLoader, key int) int {
 	for i, existingKey := range b.keys {
 		if key == existingKey {
 			return i
@@ -203,7 +203,7 @@ func (b *roadmapFollowerLoaderBatch) keyIndex(l *RoadmapFollowerLoader, key int)
 	return pos
 }
 
-func (b *roadmapFollowerLoaderBatch) startTimer(l *RoadmapFollowerLoader) {
+func (b *userRoadmapFollowingLoaderBatch) startTimer(l *UserRoadmapFollowingLoader) {
 	time.Sleep(l.wait)
 	l.mu.Lock()
 
@@ -219,7 +219,7 @@ func (b *roadmapFollowerLoaderBatch) startTimer(l *RoadmapFollowerLoader) {
 	b.end(l)
 }
 
-func (b *roadmapFollowerLoaderBatch) end(l *RoadmapFollowerLoader) {
+func (b *userRoadmapFollowingLoaderBatch) end(l *UserRoadmapFollowingLoader) {
 	b.data, b.error = l.fetch(b.keys)
 	close(b.done)
 }

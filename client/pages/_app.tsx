@@ -1,6 +1,7 @@
 import { AppProps } from "next/app";
 import { ApolloProvider } from "@apollo/client";
 import { useApollo } from "../apollo-client";
+import { UserProvider } from "@auth0/nextjs-auth0";
 import "../styles/globals.css";
 
 function App({ Component, pageProps }: AppProps) {
@@ -8,7 +9,9 @@ function App({ Component, pageProps }: AppProps) {
 
   return (
     <ApolloProvider client={client}>
-      <Component {...pageProps} />;
+      <UserProvider>
+        <Component {...pageProps} />
+      </UserProvider>
     </ApolloProvider>
   );
 }
