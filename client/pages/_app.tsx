@@ -15,7 +15,7 @@ function App({ Component, pageProps }: AppProps) {
         clientId="2El7qcsqxaGzhb6ys9SME8Ofxdcvst34"
         redirectUri="https://roadmapper.vercel.app/private"
         audience="https://dev-jkn4emz6.us.auth0.com/api/v2/"
-        // cacheLocation="localstorage"
+        cacheLocation="localstorage"
         useRefreshTokens={true}
         // scope={auth0Config.scope}
       >
