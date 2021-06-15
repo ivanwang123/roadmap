@@ -11,12 +11,12 @@ function App({ Component, pageProps }: AppProps) {
   return (
     <ApolloProvider client={client}>
       <Auth0Provider
-        domain="dev-jkn4emz6.us.auth0.com"
-        clientId="2El7qcsqxaGzhb6ys9SME8Ofxdcvst34"
-        redirectUri="https://roadmapper.vercel.app/private"
-        audience="https://dev-jkn4emz6.us.auth0.com/api/v2/"
+        domain={process.env.AUTH0_DOMAIN || ""}
+        clientId={process.env.AUTH0_CLIENT_ID || ""}
+        redirectUri="http://localhost:3000/private"
+        audience={process.env.AUTH0_AUDIENCE || ""}
         cacheLocation="localstorage"
-        useRefreshTokens={true}
+        // useRefreshTokens={true}
         // scope={auth0Config.scope}
       >
         <Component {...pageProps} />
