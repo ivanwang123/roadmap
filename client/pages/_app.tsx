@@ -11,10 +11,10 @@ function App({ Component, pageProps }: AppProps) {
   return (
     <ApolloProvider client={client}>
       <Auth0Provider
-        domain={"dev-jkn4emz6.us.auth0.com" || ""}
-        clientId={"2El7qcsqxaGzhb6ys9SME8Ofxdcvst34" || ""}
+        domain="dev-jkn4emz6.us.auth0.com"
+        clientId="2El7qcsqxaGzhb6ys9SME8Ofxdcvst34"
         redirectUri="http://localhost:3000/private"
-        audience={"https://dev-jkn4emz6.us.auth0.com/api/v2/"}
+        audience="https://dev-jkn4emz6.us.auth0.com/api/v2/"
         // scope={auth0Config.scope}
       >
         <Component {...pageProps} />
