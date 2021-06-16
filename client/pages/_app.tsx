@@ -10,18 +10,10 @@ function App({ Component, pageProps }: AppProps) {
   return (
     <ApolloProvider client={client}>
       <Auth0Provider
-        domain={
-          process.env.NEXT_PUBLIC_AUTH0_DOMAIN || "dev-jkn4emz6.us.auth0.com"
-        }
-        clientId={
-          process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID ||
-          "2El7qcsqxaGzhb6ys9SME8Ofxdcvst34"
-        }
-        redirectUri="https://roadmapper.vercel.app/private"
-        audience={
-          process.env.NEXT_PUBLIC_AUTH0_AUDIENCE ||
-          "https://dev-jkn4emz6.us.auth0.com/api/v2/"
-        }
+        domain={process.env.NEXT_PUBLIC_AUTH0_DOMAIN || ""}
+        clientId={process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID || ""}
+        redirectUri="http://localhost:3000/private"
+        audience={process.env.NEXT_PUBLIC_AUTH0_AUDIENCE || ""}
         scope="openid profile"
         // cacheLocation="localstorage"
         useRefreshTokens={true}
