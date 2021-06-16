@@ -1,19 +1,19 @@
 # MUTATIONS
 
 type Mutation {
-  createUser(input: NewUser!): User!
-  createCheckpoint(input: NewCheckpoint!): Checkpoint!
-  createRoadmap(input: NewRoadmap!): Roadmap!
-  login(input: Login!): String!
-  toggleFollowRoadmap(input: FollowRoadmap!): Boolean!
+  createUser(input: NewUser!): User! @isAuthenticated
+  createCheckpoint(input: NewCheckpoint!): Checkpoint! @isAuthenticated
+  createRoadmap(input: NewRoadmap!): Roadmap! @isAuthenticated
+  toggleFollowRoadmap(input: FollowRoadmap!): Boolean! @isAuthenticated
 }
+
+directive @isAuthenticated on FIELD_DEFINITION
 
 # INPUTS
 
 input NewUser {
   username: String!
   email: String!
-  password: String!
 }
 
 input NewCheckpoint {
@@ -31,10 +31,4 @@ input NewRoadmap {
 input FollowRoadmap {
   userId: Int!
   roadmapId: Int!
-}
-
-input Login {
-  username: String
-  email: String
-  password: String!
 }

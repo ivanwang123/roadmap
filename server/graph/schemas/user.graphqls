@@ -4,7 +4,6 @@ type User {
   id: ID!
   username: String!
   email: String!
-  password: String!
   followingRoadmaps: [Roadmap!]!
   createdRoadmaps: [Roadmap!]!
   createdAt: Time!

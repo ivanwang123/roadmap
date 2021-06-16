@@ -15,12 +15,6 @@ type GetUser struct {
 	UserID int `json:"userId"`
 }
 
-type Login struct {
-	Username *string `json:"username"`
-	Email    *string `json:"email"`
-	Password string  `json:"password"`
-}
-
 type NewCheckpoint struct {
 	Title        string `json:"title"`
 	Instructions string `json:"instructions"`
@@ -36,5 +30,4 @@ type NewRoadmap struct {
 type NewUser struct {
 	Username string `json:"username"`
 	Email    string `json:"email"`
-	Password string `json:"password"`
 }

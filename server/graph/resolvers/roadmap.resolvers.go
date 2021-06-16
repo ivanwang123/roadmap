@@ -22,7 +22,6 @@ func (r *roadmapResolver) Checkpoints(ctx context.Context, obj *model.Roadmap) (
 
 func (r *roadmapResolver) Followers(ctx context.Context, obj *model.Roadmap) ([]*model.User, error) {
 	return dataloaders.ForContext(ctx).UserByRoadmapFollowing.Load(obj.ID)
-	// return stores.ForContext(ctx).RoadmapFollowerStore.GetByRoadmapId(obj.ID)
 }
 
 // Roadmap returns generated.RoadmapResolver implementation.

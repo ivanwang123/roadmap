@@ -9,6 +9,7 @@ import { useMemo } from "react";
 let apolloClient: ApolloClient<NormalizedCacheObject> | undefined;
 
 function createApolloClient(): ApolloClient<any> {
+  console.log("CREATE APOLLO CLIENT");
   return new ApolloClient({
     /**
      * Enable SSR mode when not running on the client-side

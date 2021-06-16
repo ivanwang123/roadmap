@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"strconv"
 	"sync"
 	"sync/atomic"
@@ -45,6 +46,7 @@ type ResolverRoot interface {
 }
 
 type DirectiveRoot struct {
+	IsAuthenticated func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 }
 
 type ComplexityRoot struct {
@@ -63,7 +65,6 @@ type ComplexityRoot struct {
 		CreateCheckpoint    func(childComplexity int, input model.NewCheckpoint) int
 		CreateRoadmap       func(childComplexity int, input model.NewRoadmap) int
 		CreateUser          func(childComplexity int, input model.NewUser) int
-		Login               func(childComplexity int, input model.Login) int
 		ToggleFollowRoadmap func(childComplexity int, input model.FollowRoadmap) int
 	}
 
@@ -97,7 +98,6 @@ type ComplexityRoot struct {
 		Email             func(childComplexity int) int
 		FollowingRoadmaps func(childComplexity int) int
 		ID                func(childComplexity int) int
-		Password          func(childComplexity int) int
 		UpdatedAt         func(childComplexity int) int
 		Username          func(childComplexity int) int
 	}
@@ -110,7 +110,6 @@ type MutationResolver interface {
 	CreateUser(ctx context.Context, input model.NewUser) (*model.User, error)
 	CreateCheckpoint(ctx context.Context, input model.NewCheckpoint) (*model.Checkpoint, error)
 	CreateRoadmap(ctx context.Context, input model.NewRoadmap) (*model.Roadmap, error)
-	Login(ctx context.Context, input model.Login) (string, error)
 	ToggleFollowRoadmap(ctx context.Context, input model.FollowRoadmap) (bool, error)
 }
 type QueryResolver interface {
@@ -239,18 +238,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateUser(childComplexity, args["input"].(model.NewUser)), true
-
-	case "Mutation.login":
-		if e.complexity.Mutation.Login == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_login_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.Login(childComplexity, args["input"].(model.Login)), true
 
 	case "Mutation.toggleFollowRoadmap":
 		if e.complexity.Mutation.ToggleFollowRoadmap == nil {
@@ -414,13 +401,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.ID(childComplexity), true
 
-	case "User.password":
-		if e.complexity.User.Password == nil {
-			break
-		}
-
-		return e.complexity.User.Password(childComplexity), true
-
 	case "User.updatedAt":
 		if e.complexity.User.UpdatedAt == nil {
 			break
@@ -513,19 +493,19 @@ var sources = []*ast.Source{
 	{Name: "graph/schemas/mutations.graphqls", Input: `# MUTATIONS
 
 type Mutation {
-  createUser(input: NewUser!): User!
-  createCheckpoint(input: NewCheckpoint!): Checkpoint!
-  createRoadmap(input: NewRoadmap!): Roadmap!
-  login(input: Login!): String!
-  toggleFollowRoadmap(input: FollowRoadmap!): Boolean!
+  createUser(input: NewUser!): User! @isAuthenticated
+  createCheckpoint(input: NewCheckpoint!): Checkpoint! @isAuthenticated
+  createRoadmap(input: NewRoadmap!): Roadmap! @isAuthenticated
+  toggleFollowRoadmap(input: FollowRoadmap!): Boolean! @isAuthenticated
 }
+
+directive @isAuthenticated on FIELD_DEFINITION
 
 # INPUTS
 
 input NewUser {
   username: String!
   email: String!
-  password: String!
 }
 
 input NewCheckpoint {
@@ -543,12 +523,6 @@ input NewRoadmap {
 input FollowRoadmap {
   userId: Int!
   roadmapId: Int!
-}
-
-input Login {
-  username: String
-  email: String
-  password: String!
 }
 `, BuiltIn: false},
 	{Name: "graph/schemas/queries.graphqls", Input: `# QUERIES
@@ -593,7 +567,6 @@ type User {
   id: ID!
   username: String!
   email: String!
-  password: String!
   followingRoadmaps: [Roadmap!]!
   createdRoadmaps: [Roadmap!]!
   createdAt: Time!
@@ -644,21 +617,6 @@ func (ec *executionContext) field_Mutation_createUser_args(ctx context.Context, 
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNNewUser2githubᚗcomᚋivanwang123ᚋroadmapᚋserverᚋgraphᚋmodelᚐNewUser(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_login_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 model.Login
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNLogin2githubᚗcomᚋivanwang123ᚋroadmapᚋserverᚋgraphᚋmodelᚐLogin(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1066,8 +1024,28 @@ func (ec *executionContext) _Mutation_createUser(ctx context.Context, field grap
 	}
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateUser(rctx, args["input"].(model.NewUser))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().CreateUser(rctx, args["input"].(model.NewUser))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.IsAuthenticated == nil {
+				return nil, errors.New("directive isAuthenticated is not implemented")
+			}
+			return ec.directives.IsAuthenticated(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.User); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/ivanwang123/roadmap/server/graph/model.User`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1108,8 +1086,28 @@ func (ec *executionContext) _Mutation_createCheckpoint(ctx context.Context, fiel
 	}
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateCheckpoint(rctx, args["input"].(model.NewCheckpoint))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().CreateCheckpoint(rctx, args["input"].(model.NewCheckpoint))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.IsAuthenticated == nil {
+				return nil, errors.New("directive isAuthenticated is not implemented")
+			}
+			return ec.directives.IsAuthenticated(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.Checkpoint); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/ivanwang123/roadmap/server/graph/model.Checkpoint`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1150,8 +1148,28 @@ func (ec *executionContext) _Mutation_createRoadmap(ctx context.Context, field g
 	}
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateRoadmap(rctx, args["input"].(model.NewRoadmap))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().CreateRoadmap(rctx, args["input"].(model.NewRoadmap))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.IsAuthenticated == nil {
+				return nil, errors.New("directive isAuthenticated is not implemented")
+			}
+			return ec.directives.IsAuthenticated(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.Roadmap); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/ivanwang123/roadmap/server/graph/model.Roadmap`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1166,48 +1184,6 @@ func (ec *executionContext) _Mutation_createRoadmap(ctx context.Context, field g
 	res := resTmp.(*model.Roadmap)
 	fc.Result = res
 	return ec.marshalNRoadmap2ᚖgithubᚗcomᚋivanwang123ᚋroadmapᚋserverᚋgraphᚋmodelᚐRoadmap(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_login_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().Login(rctx, args["input"].(model.Login))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_toggleFollowRoadmap(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1234,8 +1210,28 @@ func (ec *executionContext) _Mutation_toggleFollowRoadmap(ctx context.Context, f
 	}
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().ToggleFollowRoadmap(rctx, args["input"].(model.FollowRoadmap))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().ToggleFollowRoadmap(rctx, args["input"].(model.FollowRoadmap))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.IsAuthenticated == nil {
+				return nil, errors.New("directive isAuthenticated is not implemented")
+			}
+			return ec.directives.IsAuthenticated(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(bool); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1951,41 +1947,6 @@ func (ec *executionContext) _User_email(ctx context.Context, field graphql.Colle
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Email, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _User_password(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "User",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Password, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3297,42 +3258,6 @@ func (ec *executionContext) unmarshalInputGetUser(ctx context.Context, obj inter
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputLogin(ctx context.Context, obj interface{}) (model.Login, error) {
-	var it model.Login
-	var asMap = obj.(map[string]interface{})
-
-	for k, v := range asMap {
-		switch k {
-		case "username":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
-			it.Username, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "email":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
-			it.Email, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "password":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
-			it.Password, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
 func (ec *executionContext) unmarshalInputNewCheckpoint(ctx context.Context, obj interface{}) (model.NewCheckpoint, error) {
 	var it model.NewCheckpoint
 	var asMap = obj.(map[string]interface{})
@@ -3424,14 +3349,6 @@ func (ec *executionContext) unmarshalInputNewUser(ctx context.Context, obj inter
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
 			it.Email, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "password":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
-			it.Password, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3544,11 +3461,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "createRoadmap":
 			out.Values[i] = ec._Mutation_createRoadmap(ctx, field)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "login":
-			out.Values[i] = ec._Mutation_login(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -3821,11 +3733,6 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "email":
 			out.Values[i] = ec._User_email(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
-		case "password":
-			out.Values[i] = ec._User_password(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -4222,11 +4129,6 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 		}
 	}
 	return res
-}
-
-func (ec *executionContext) unmarshalNLogin2githubᚗcomᚋivanwang123ᚋroadmapᚋserverᚋgraphᚋmodelᚐLogin(ctx context.Context, v interface{}) (model.Login, error) {
-	res, err := ec.unmarshalInputLogin(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNNewCheckpoint2githubᚗcomᚋivanwang123ᚋroadmapᚋserverᚋgraphᚋmodelᚐNewCheckpoint(ctx context.Context, v interface{}) (model.NewCheckpoint, error) {

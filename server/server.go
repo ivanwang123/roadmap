@@ -1,15 +1,19 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"regexp"
 	"strings"
 
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/go-chi/chi"
+	"github.com/go-chi/cors"
 	"github.com/ivanwang123/roadmap/server/auth"
 	"github.com/ivanwang123/roadmap/server/dataloaders"
 	"github.com/ivanwang123/roadmap/server/graph/generated"
@@ -34,14 +38,33 @@ func main() {
 
 	router := chi.NewRouter()
 
+	router.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:3000", "https://roadmapper.vercel.app"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Origin", "Authorization", "Content-Type", "X-CSRF-Token"},
+		AllowCredentials: true,
+	}))
 	router.Use(stores.Middleware(store))
 	router.Use(dataloaders.Middleware(db))
-	router.Use(auth.Middleware(store))
+	router.Use(auth.Middleware())
 
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &resolvers.Resolver{}}))
+	// TODO: Add IsUnAuthenticated directive
+	c := generated.Config{Resolvers: &resolvers.Resolver{}}
+	c.Directives.IsAuthenticated = func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error) {
+		if auth.ForContext(ctx) != "" {
+			fmt.Println("AUTHENTICATED DIRECTIVE")
+			return next(ctx)
+		} else {
+			fmt.Println("UNAUTHENTICATED DIRECTIVE")
+			return nil, fmt.Errorf("Access denied")
+		}
+	}
+
+	srv := handler.NewDefaultServer(generated.NewExecutableSchema(c))
 
 	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	router.Handle("/query", srv)
+	router.Post("/login/{code}", auth.HandleLogin())
 
 	port := os.Getenv("PORT")
 	if port == "" {
