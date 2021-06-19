@@ -5,6 +5,7 @@ type Query {
   oneRoadmap(input: GetRoadmap): Roadmap!
   allUsers: [User!]!
   allRoadmaps: [Roadmap!]!
+  me: User @isAuthenticated
 }
 
 # INPUTS

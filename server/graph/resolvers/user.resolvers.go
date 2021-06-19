@@ -14,12 +14,10 @@ import (
 
 func (r *userResolver) FollowingRoadmaps(ctx context.Context, obj *model.User) ([]*model.Roadmap, error) {
 	return dataloaders.ForContext(ctx).RoadmapByFollower.Load(obj.ID)
-	// return stores.ForContext(ctx).RoadmapFollowerStore.GetByUserId(obj.ID)
 }
 
 func (r *userResolver) CreatedRoadmaps(ctx context.Context, obj *model.User) ([]*model.Roadmap, error) {
 	return stores.ForContext(ctx).RoadmapStore.GetByCreatorId(obj.ID)
-	// return dataloaders.ForContext(ctx).RoadmapByCreatorId.Load(obj.ID)
 }
 
 // User returns generated.UserResolver implementation.

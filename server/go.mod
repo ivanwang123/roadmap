@@ -8,6 +8,7 @@ require (
 	github.com/form3tech-oss/jwt-go v3.2.3+incompatible // indirect
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-chi/cors v1.2.0 // indirect
+	github.com/graph-gophers/dataloader v5.0.0+incompatible // indirect
 	github.com/jackc/pgx/v4 v4.11.0
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/vektah/dataloaden v0.3.0 // indirect

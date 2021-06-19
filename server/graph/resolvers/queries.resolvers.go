@@ -5,7 +5,6 @@ package resolvers
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/ivanwang123/roadmap/server/auth"
 	"github.com/ivanwang123/roadmap/server/graph/generated"
@@ -22,14 +21,16 @@ func (r *queryResolver) OneRoadmap(ctx context.Context, input *model.GetRoadmap)
 }
 
 func (r *queryResolver) AllUsers(ctx context.Context) ([]*model.User, error) {
-	// TODO: Remove
-	email := auth.ForContext(ctx)
-	fmt.Println("CONTEXT EMAIL", email)
 	return stores.ForContext(ctx).UserStore.GetAll()
 }
 
 func (r *queryResolver) AllRoadmaps(ctx context.Context) ([]*model.Roadmap, error) {
 	return stores.ForContext(ctx).RoadmapStore.GetAll()
+}
+
+func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
+	userId := auth.ForContext(ctx)
+	return stores.ForContext(ctx).UserStore.GetById(userId)
 }
 
 // Query returns generated.QueryResolver implementation.

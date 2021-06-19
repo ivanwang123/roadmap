@@ -28,7 +28,7 @@ func (s *RoadmapStore) GetAll() ([]*model.Roadmap, error) {
 
 func (s *RoadmapStore) GetById(id int) (*model.Roadmap, error) {
 	var roadmap model.Roadmap
-	if err := s.Get(&roadmap, "SELECT * FROM roadmaps WHERE id = $1", id); err != nil {
+	if err := s.Get(&roadmap, "SELECT * FROM roadmaps WHERE id = $1 LIMIT 1", id); err != nil {
 		return nil, err
 	}
 	return &roadmap, nil

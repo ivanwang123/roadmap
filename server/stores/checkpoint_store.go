@@ -20,7 +20,7 @@ func (s *CheckpointStore) Create(input *model.NewCheckpoint) (*model.Checkpoint,
 
 func (s *CheckpointStore) GetByRoadmap(roadmapId int) ([]*model.Checkpoint, error) {
 	checkpoints := []*model.Checkpoint{}
-	if err := s.Get(&checkpoints, "SELECT * FROM checkpoints WHERE roadmap_id = $1",
+	if err := s.Get(&checkpoints, "SELECT * FROM checkpoints WHERE roadmap_id = $1 LIMIT 1",
 		roadmapId); err != nil {
 		return nil, err
 	}

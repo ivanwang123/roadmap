@@ -5,7 +5,11 @@ package resolvers
 
 import (
 	"context"
+	"fmt"
+	"time"
 
+	"github.com/ivanwang123/roadmap/server/auth"
+	"github.com/ivanwang123/roadmap/server/cookie"
 	"github.com/ivanwang123/roadmap/server/graph/generated"
 	"github.com/ivanwang123/roadmap/server/graph/model"
 	"github.com/ivanwang123/roadmap/server/stores"
@@ -25,6 +29,28 @@ func (r *mutationResolver) CreateRoadmap(ctx context.Context, input model.NewRoa
 
 func (r *mutationResolver) ToggleFollowRoadmap(ctx context.Context, input model.FollowRoadmap) (bool, error) {
 	return stores.ForContext(ctx).RoadmapFollowerStore.ToggleFollowRoadmap(&input)
+}
+
+func (r *mutationResolver) Login(ctx context.Context, input model.Login) (*model.User, error) {
+	user, err := stores.ForContext(ctx).UserStore.Authenticate(&input)
+	if err != nil {
+		return nil, err
+	}
+
+	userToken, err := auth.GenerateToken(user.ID, time.Hour*24)
+	if err != nil {
+		return nil, err
+	}
+	refreshToken, err := auth.GenerateToken(user.ID, time.Hour*24*7)
+	if err != nil {
+		return nil, err
+	}
+
+	cookie.ForContext(ctx).SetCookie("user", userToken, time.Hour*24)
+	cookie.ForContext(ctx).SetCookie("refresh", refreshToken, time.Hour*24*7)
+	fmt.Println("LOGIN SET COOKIES")
+
+	return user, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

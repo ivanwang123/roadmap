@@ -6,14 +6,14 @@ package resolvers
 import (
 	"context"
 
-	"github.com/ivanwang123/roadmap/server/dataloaders"
 	"github.com/ivanwang123/roadmap/server/graph/generated"
 	"github.com/ivanwang123/roadmap/server/graph/model"
+	"github.com/ivanwang123/roadmap/server/loaders"
 	"github.com/ivanwang123/roadmap/server/stores"
 )
 
 func (r *roadmapResolver) Creator(ctx context.Context, obj *model.Roadmap) (*model.User, error) {
-	return dataloaders.ForContext(ctx).UserById.Load(obj.CreatorID)
+	return loaders.ForContext(ctx).UserById(obj.CreatorID)
 }
 
 func (r *roadmapResolver) Checkpoints(ctx context.Context, obj *model.Roadmap) ([]*model.Checkpoint, error) {
@@ -21,7 +21,7 @@ func (r *roadmapResolver) Checkpoints(ctx context.Context, obj *model.Roadmap) (
 }
 
 func (r *roadmapResolver) Followers(ctx context.Context, obj *model.Roadmap) ([]*model.User, error) {
-	return dataloaders.ForContext(ctx).UserByRoadmapFollowing.Load(obj.ID)
+	return loaders.ForContext(ctx).UserByRoadmapFollowing(obj.ID)
 }
 
 // Roadmap returns generated.RoadmapResolver implementation.

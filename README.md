@@ -1,10 +1,9 @@
 # TODO
 
-- Finish all resolvers
 - Remove password from return value
 - Implement testing
-- Look into dataloaders
 - Query complexity
+- Replace dataloaden
 
 # TECHNOLOGIES
 
@@ -17,4 +16,3 @@
 - Go
 - Gqlgen
 - Dataloaden
-- Auth0

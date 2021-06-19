@@ -1,13 +1,14 @@
-import React, { useState } from "react";
-import Router, { useRouter } from "next/router";
-import Alert from "../components/Alert";
 import { useMutation } from "@apollo/client";
-import { useForm } from "react-hook-form";
-import { ME_QUERY } from "../graphql/queries/me";
-import { LOGIN_MUTATION } from "../graphql/mutations/login";
 import Link from "next/link";
+import Router, { useRouter } from "next/router";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import Alert from "../components/Alert";
+import { REGISTER_MUTATION } from "../graphql/mutations/register";
+import { ME_QUERY } from "../graphql/queries/me";
 
-function Login() {
+function Register() {
+  const [signup] = useMutation(REGISTER_MUTATION);
   const [error, setError] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
 
@@ -17,23 +18,21 @@ function Login() {
     formState: { errors },
   } = useForm();
 
-  const [login] = useMutation(LOGIN_MUTATION);
-
   const onSubmit = (data: any) => {
     console.log("SUBMIT", data);
-    login({
+    signup({
       variables: data,
       update: (cache, { data }) => {
-        if (!data || !data.login) {
+        if (!data || !data.createUser) {
           return;
         }
 
-        console.log("LOGIN DATA", data);
+        console.log("REGISTER DATA", data);
         cache.writeQuery({
           query: ME_QUERY,
           data: {
             __typename: "Query",
-            me: data.login,
+            me: data.createUser,
           },
         });
       },
@@ -53,7 +52,7 @@ function Login() {
 
   return (
     <div>
-      <h1 className="font-bold">Login</h1>
+      <h1 className="font-bold">Sign up</h1>
       <Alert message={message} error={error} />
 
       <form className="flex flex-col" onSubmit={handleSubmit(onSubmit)}>
@@ -73,42 +72,52 @@ function Login() {
         />
         {errors.email && <span>{errors.email?.message}</span>}
 
+        <label htmlFor="username">Username</label>
+        <input
+          type="text"
+          id="username"
+          {...register("username", {
+            required: { value: true, message: "Username is required" },
+            maxLength: {
+              value: 20,
+              message: "Username must be less than 20 characters long",
+            },
+          })}
+        />
+        {errors.username && <span>{errors.username?.message}</span>}
+
         <label htmlFor="password">Password</label>
         <input
           type="password"
           id="password"
           {...register("password", {
             required: { value: true, message: "Password is required" },
-            minLength: {
-              value: 8,
-              message: "Password must be at least 8 characters long",
-            },
           })}
         />
         {errors.password && <span>{errors.password?.message}</span>}
 
-        <button type="submit">Log in</button>
+        <button type="submit">Sign up</button>
       </form>
       <div>
-        Don't have an account? <RedirectToSignup />
+        Already have an account? <RedirectToLogin />
       </div>
     </div>
   );
 }
 
-function RedirectToSignup() {
+function RedirectToLogin() {
   const router = useRouter();
   let href: any = {
-    pathname: "/register",
+    pathname: "/login",
   };
   if (router.query.redirect !== undefined) {
     href["query"] = { redirect: router.query.redirect };
   }
   return (
     <Link href={href}>
-      <a>Sign up</a>
+      <a>Log in</a>
     </Link>
   );
 }
 
-export default Login;
+export default Register;

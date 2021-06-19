@@ -1,6 +1,7 @@
 package dataloaders
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/ivanwang123/roadmap/server/graph/model"
@@ -14,6 +15,7 @@ func UserById(db *sqlx.DB) *UserLoader {
 		fetch: func(ids []int) ([]*model.User, []error) {
 			users := []*model.User{}
 			errors := Fetcher(db, "users", "id", ids, &users)
+			fmt.Println("FETCH USERS")
 
 			return users, errors
 		},

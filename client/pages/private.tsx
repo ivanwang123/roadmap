@@ -1,53 +1,89 @@
 import React from "react";
-import { useAuth0 } from "@auth0/auth0-react";
-import { gql } from "@apollo/client";
-import useAuthQuery from "../hooks/useAuthQuery";
+import withAuth, { ChildProps } from "../hoc/withAuth";
+import Router from "next/router";
+import Redirecting from "../components/Redirecting";
+import Loading from "../components/Loading";
+import Layout from "../components/Layout";
 
-const GET_USERS = gql`
-  query {
-    allUsers {
-      id
-      username
-      # followingRoadmaps {
-      #   id
-      #   title
-      #   description
-      # }
-      # createdRoadmaps {
-      #   id
-      #   title
-      # }
-    }
+type InputProps = {
+  roadmaps: string[];
+};
+
+function Private({
+  data: { me, loading, error },
+  roadmaps,
+}: ChildProps<InputProps>) {
+  console.log("ROADMAPS", roadmaps);
+  if (loading) return <Loading />;
+  if (error) {
+    Router.push({ pathname: "/login", query: { redirect: Router.pathname } });
+    return <Redirecting />;
   }
-`;
-
-function Private() {
-  const { logout, user, getAccessTokenSilently } = useAuth0();
-  const { data } = useAuthQuery(GET_USERS);
-
-  const getToken = async () => {
-    try {
-      const token = await getAccessTokenSilently({ ignoreCache: true });
-      console.log("TOKEN", token);
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
   return (
-    <div>
+    <Layout title="Private | Roadmap">
       <h1>Private</h1>
-      <pre>{JSON.stringify(user, null, 2)}</pre>
-      {/* TODO: client.clearStore() when log out */}
-      <button
-        onClick={() => logout({ returnTo: "http://localhost:3000/login" })}
-      >
-        Log out
-      </button>
-      <button onClick={getToken}>Get token</button>
-      <pre>{JSON.stringify(data, null, 2)}</pre>
-    </div>
+      <pre>{JSON.stringify(me, null, 2)}</pre>
+    </Layout>
   );
 }
 
-export default Private;
+export default withAuth<InputProps>()(Private);
+
+export const getServerSideProps = async () => {
+  const props: InputProps = {
+    roadmaps: ["hi again"],
+  };
+
+  return {
+    props,
+  };
+};
+
+// const GET_USERS = gql`
+//   query {
+//     allUsers {
+//       id
+//       username
+//       # followingRoadmaps {
+//       #   id
+//       #   title
+//       #   description
+//       # }
+//       # createdRoadmaps {
+//       #   id
+//       #   title
+//       # }
+//     }
+//   }
+// `;
+// { me }: InferGetStaticPropsType<typeof getServerSideProps>
+
+// export const getServerSideProps: GetServerSideProps = async () => {
+//   const client = getApolloClient();
+//   const { data, error } = await client.query({
+//     query: gql`
+//       query Me {
+//         me {
+//           id
+//           username
+//           email
+//         }
+//       }
+//     `,
+//   });
+
+//   if (!data.me || error) {
+//     return {
+//       redirect: {
+//         destination: "/login",
+//         permanent: false,
+//       },
+//     };
+//   }
+
+//   return {
+//     props: {
+//       me: data.me,
+//     },
+//   };
+// };

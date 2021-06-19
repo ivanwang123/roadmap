@@ -1,16 +1,16 @@
 .PHONY: create up down force generate dataloader air
 
 create:
-	migrate create -ext sql -dir db/migrations/ -seq add_checkpoints
+	migrate create -ext sql -dir database/migrations/ -seq add_checkpoints
 
 up:
-	migrate -database postgres://postgres:postgres@localhost/roadmap?sslmode=disable -path db/migrations/ up
+	migrate -database postgres://postgres:postgres@localhost/roadmap?sslmode=disable -path database/migrations/ up
 	
 down:
-	migrate -database postgres://postgres:postgres@localhost/roadmap?sslmode=disable -path db/migrations/ down
+	migrate -database postgres://postgres:postgres@localhost/roadmap?sslmode=disable -path database/migrations/ down
 
 force:
-	migrate -database postgres://postgres:postgres@localhost/roadmap?sslmode=disable -path db/migrations/ force 3
+	migrate -database postgres://postgres:postgres@localhost/roadmap?sslmode=disable -path database/migrations/ force 3
 
 generate:
 	go run github.com/99designs/gqlgen generate

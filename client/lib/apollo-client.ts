@@ -17,9 +17,10 @@ function createApolloClient(): ApolloClient<any> {
     ssrMode: typeof window === "undefined",
     link: new HttpLink({
       uri: "http://localhost:8080/query",
-      credentials: "same-origin",
+      credentials: "include",
     }),
     cache: new InMemoryCache(),
+    connectToDevTools: true,
   });
 }
 
