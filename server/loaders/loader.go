@@ -17,6 +17,8 @@ const loaderCtxKey = "loader"
 type Loader struct {
 	UserById               func(userId int) (*model.User, error)
 	UserByRoadmapFollowing func(roadmapId int) ([]*model.User, error)
+	RoadmapById            func(roadmapId int) (*model.Roadmap, error)
+	RoadmapByFollower      func(userId int) ([]*model.Roadmap, error)
 }
 
 // TODO: Clean up and replace dataloaden
@@ -26,6 +28,8 @@ func Middleware(db *sqlx.DB) func(http.Handler) http.Handler {
 			loader := &Loader{
 				UserById:               UserById(r.Context()),
 				UserByRoadmapFollowing: UserByRoadmapFollowing(r.Context()),
+				RoadmapById:            RoadmapById(r.Context()),
+				RoadmapByFollower:      RoadmapByFollower(r.Context()),
 			}
 			ctx := context.WithValue(r.Context(), loaderCtxKey, loader)
 

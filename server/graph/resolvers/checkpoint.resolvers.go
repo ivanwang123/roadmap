@@ -6,13 +6,13 @@ package resolvers
 import (
 	"context"
 
-	"github.com/ivanwang123/roadmap/server/dataloaders"
 	"github.com/ivanwang123/roadmap/server/graph/generated"
 	"github.com/ivanwang123/roadmap/server/graph/model"
+	"github.com/ivanwang123/roadmap/server/loaders"
 )
 
 func (r *checkpointResolver) Roadmap(ctx context.Context, obj *model.Checkpoint) (*model.Roadmap, error) {
-	return dataloaders.ForContext(ctx).RoadmapById.Load(obj.RoadmapID)
+	return loaders.ForContext(ctx).RoadmapById(obj.RoadmapID)
 }
 
 // Checkpoint returns generated.CheckpointResolver implementation.

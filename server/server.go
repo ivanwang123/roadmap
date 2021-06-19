@@ -16,7 +16,6 @@ import (
 	"github.com/ivanwang123/roadmap/server/auth"
 	"github.com/ivanwang123/roadmap/server/cookie"
 	"github.com/ivanwang123/roadmap/server/database"
-	"github.com/ivanwang123/roadmap/server/dataloaders"
 	"github.com/ivanwang123/roadmap/server/graph/generated"
 	"github.com/ivanwang123/roadmap/server/graph/resolvers"
 	"github.com/ivanwang123/roadmap/server/loaders"
@@ -45,7 +44,6 @@ func main() {
 
 	router.Use(database.Middleware(db))
 	router.Use(stores.Middleware(store))
-	router.Use(dataloaders.Middleware(db))
 	router.Use(loaders.Middleware(db))
 	router.Use(cookie.Middleware())
 	router.Use(auth.Middleware())

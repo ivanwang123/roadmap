@@ -30,8 +30,7 @@ func userByIdBatchFn(ctx context.Context, keys dataloader.Keys) []*dataloader.Re
 	usersMap := make(map[string]interface{})
 	users := []*model.User{}
 
-	err := Fetcher(ctx, "users", "id", keys, &users)
-	if err != nil {
+	if err := Fetcher(ctx, "users", "id", keys, &users); err != nil {
 		return HandleError(err, results)
 	}
 
@@ -65,7 +64,6 @@ func userByRoadmapFollowingBatchFn(ctx context.Context, keys dataloader.Keys) []
 
 	for i, key := range ToStrKeys(keys) {
 		if err := db.Unsafe().Select(&usersList[i], "SELECT * FROM roadmap_followers AS f LEFT JOIN users AS u ON f.user_id = u.id WHERE f.roadmap_id = $1", key); err != nil {
-			fmt.Println(err)
 			usersList[i] = []*model.User{}
 		}
 	}
