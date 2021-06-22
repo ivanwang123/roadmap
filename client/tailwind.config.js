@@ -9,10 +9,17 @@ module.exports = {
       colors: {
         ...colors,
       },
+      rotate: {
+        "-135": "-135deg",
+        135: "135deg",
+        105: "105deg",
+      },
     },
   },
   variants: {
-    extend: {},
+    extend: {
+      borderWidth: ["hover"],
+    },
   },
-  plugins: [],
+  plugins: [require("@tailwindcss/line-clamp")],
 };

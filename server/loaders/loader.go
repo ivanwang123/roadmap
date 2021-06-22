@@ -21,7 +21,6 @@ type Loader struct {
 	RoadmapByFollower      func(userId int) ([]*model.Roadmap, error)
 }
 
-// TODO: Clean up and replace dataloaden
 func Middleware(db *sqlx.DB) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

@@ -4,6 +4,7 @@ import Router, { useRouter } from "next/router";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import Alert from "../components/Alert";
+import Layout from "../components/Layout";
 import { REGISTER_MUTATION } from "../graphql/mutations/register";
 import { ME_QUERY } from "../graphql/queries/me";
 
@@ -51,57 +52,96 @@ function Register() {
   };
 
   return (
-    <div>
-      <h1 className="font-bold">Sign up</h1>
-      <Alert message={message} error={error} />
+    <Layout title="Sign up | Roadmap">
+      <main className="grid grid-cols-12">
+        <section className="col-start-2 col-end-7"></section>
+        <section className="max-w-sm col-start-7 col-end-12">
+          <h1 className="text-5xl text-gray-800 font-bold tracking-wider mt-8 mb-3">
+            Sign up
+          </h1>
+          {/* <Alert message={message} error={error} /> */}
 
-      <form className="flex flex-col" onSubmit={handleSubmit(onSubmit)}>
-        <label htmlFor="email">Email</label>
-        <input
-          type="text"
-          id="email"
-          {...register("email", {
-            required: { value: true, message: "Email is required" },
-            pattern: {
-              value: new RegExp(
-                "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$"
-              ),
-              message: "Must be a valid email",
-            },
-          })}
-        />
-        {errors.email && <span>{errors.email?.message}</span>}
+          <form className="flex flex-col" onSubmit={handleSubmit(onSubmit)}>
+            <div className="flex flex-col my-8">
+              <label htmlFor="email" className="text-gray-800 font-semibold">
+                Email
+              </label>
+              <input
+                type="text"
+                id="email"
+                className={`border-b-2 pt-1 focus:border-gray-800 focus:outline-none ${
+                  errors.email && "border-red-500"
+                }`}
+                {...register("email", {
+                  required: { value: true, message: "Email is required" },
+                  pattern: {
+                    value: new RegExp(
+                      "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$"
+                    ),
+                    message: "Must be a valid email",
+                  },
+                })}
+              />
+              <span className="h-6 text-red-500 mt-1">
+                {errors.email?.message}
+              </span>
+            </div>
 
-        <label htmlFor="username">Username</label>
-        <input
-          type="text"
-          id="username"
-          {...register("username", {
-            required: { value: true, message: "Username is required" },
-            maxLength: {
-              value: 20,
-              message: "Username must be less than 20 characters long",
-            },
-          })}
-        />
-        {errors.username && <span>{errors.username?.message}</span>}
+            <div className="flex flex-col mb-8">
+              <label htmlFor="username" className="text-gray-800 font-semibold">
+                Username
+              </label>
+              <input
+                type="text"
+                id="username"
+                className={`border-b-2 pt-1 focus:border-gray-800 focus:outline-none ${
+                  errors.email && "border-red-500"
+                }`}
+                {...register("username", {
+                  required: { value: true, message: "Username is required" },
+                  maxLength: {
+                    value: 20,
+                    message: "Username must be less than 20 characters long",
+                  },
+                })}
+              />
+              <span className="h-6 text-red-500 mt-1">
+                {errors.username?.message}
+              </span>
+            </div>
 
-        <label htmlFor="password">Password</label>
-        <input
-          type="password"
-          id="password"
-          {...register("password", {
-            required: { value: true, message: "Password is required" },
-          })}
-        />
-        {errors.password && <span>{errors.password?.message}</span>}
+            <div className="flex flex-col mb-8">
+              <label htmlFor="password" className="text-gray-800 font-semibold">
+                Password
+              </label>
+              <input
+                type="password"
+                id="password"
+                className={`border-b-2 pt-1 focus:border-gray-800 focus:outline-none ${
+                  errors.email && "border-red-500"
+                }`}
+                {...register("password", {
+                  required: { value: true, message: "Password is required" },
+                })}
+              />
+              <span className="h-6 text-red-500 mt-1">
+                {errors.password?.message}
+              </span>
+            </div>
 
-        <button type="submit">Sign up</button>
-      </form>
-      <div>
-        Already have an account? <RedirectToLogin />
-      </div>
-    </div>
+            <button
+              type="submit"
+              className="bg-green-500 text-white font-bold py-2 rounded"
+            >
+              Sign up
+            </button>
+          </form>
+          <div className="text-sm text-gray-500 text-center mt-6">
+            Already have an account? <RedirectToLogin />
+          </div>
+        </section>
+      </main>
+    </Layout>
   );
 }
 
@@ -115,7 +155,7 @@ function RedirectToLogin() {
   }
   return (
     <Link href={href}>
-      <a>Log in</a>
+      <a className="text-blue-500 hover:underline">Log in</a>
     </Link>
   );
 }

@@ -21,7 +21,21 @@ h6 {
   /* font-family: "Fredoka One", cursive; */
 }
 
+.navbar-grid {
+  display: grid;
+  grid-template-columns: 100%;
+  grid-template-rows: auto 1fr;
+}
+
 .sidebar-grid {
   display: grid;
   grid-template-columns: auto 1fr;
+}
+
+.rotate-arrow {
+  transform: rotate(45deg) scaleX(-1);
+}
+
+.mr-xs {
+  margin-right: 0.06rem;
 }
