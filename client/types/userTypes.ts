@@ -1,12 +1,21 @@
-import { Roadmap } from "./roadmapTypes";
+import { RoadmapType } from "./roadmapTypes";
 
-export type User = {
+export type UserType = {
   id: number;
   username: string;
   email: string;
   password: string;
-  followingRoadmaps: Roadmap[];
-  createdRoadmaps: Roadmap[];
+  followingRoadmaps: RoadmapType[];
+  createdRoadmaps: RoadmapType[];
   createdAt: Date;
   updatedAt: Date;
+};
+
+export type CreatorType = {
+  id: number;
+  username: string;
+};
+
+export type FollowerType = {
+  id: number;
 };

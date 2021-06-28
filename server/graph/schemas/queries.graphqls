@@ -1,19 +1,19 @@
 # QUERIES
 
 type Query {
-  oneUser(input: GetUser): User!
-  oneRoadmap(input: GetRoadmap): Roadmap!
-  allUsers: [User!]!
-  allRoadmaps: [Roadmap!]!
+  user(input: GetUser): User!
+  roadmap(input: GetRoadmap): Roadmap!
+  users: [User!]!
+  roadmaps: [Roadmap!]!
   me: User @isAuthenticated
 }
 
 # INPUTS
 
 input GetUser {
-  userId: Int!
+  id: Int!
 }
 
 input GetRoadmap {
-  roadmapId: Int!
+  id: Int!
 }

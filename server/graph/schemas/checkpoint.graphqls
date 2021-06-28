@@ -2,9 +2,16 @@ type Checkpoint {
   id: ID!
   title: String!
   instructions: String!
-  links: [String!]!
-  isCompleted: Boolean
+  links: [Link!]!
+  status: String
   roadmap: Roadmap!
   createdAt: Time!
   updatedAt: Time!
+}
+
+type Link {
+  url: String!
+  title: String!
+  description: String!
+  image: String!
 }

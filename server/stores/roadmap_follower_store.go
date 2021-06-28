@@ -1,6 +1,8 @@
 package stores
 
 import (
+	"fmt"
+
 	"github.com/ivanwang123/roadmap/server/graph/model"
 	"github.com/jmoiron/sqlx"
 )
@@ -17,5 +19,22 @@ func (s *RoadmapFollowerStore) ToggleFollowRoadmap(input *model.FollowRoadmap) (
 		}
 		return false, nil
 	}
+
+	// TODO: Get roadmap and add checkpoint status to all checkpoints
+	checkpoints := make([]int64, 0)
+	err := s.Select(&checkpoints, "SELECT id FROM checkpoints WHERE roadmap_id = $1", input.RoadmapID)
+	fmt.Println("CHECKPOINTS", checkpoints, err)
+	if err != nil {
+		return true, err
+	}
+
+	for _, checkpointID := range checkpoints {
+		// TODO: Batch request in transaction
+		_, err := s.Exec("INSERT INTO checkpoint_status (user_id, checkpoint_id, roadmap_id) VALUES ($1, $2, $3)", input.UserID, checkpointID, input.RoadmapID)
+		if err != nil {
+			return true, err
+		}
+	}
+
 	return true, nil
 }

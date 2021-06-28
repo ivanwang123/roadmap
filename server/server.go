@@ -42,11 +42,11 @@ func main() {
 		AllowCredentials: true,
 	}))
 
+	router.Use(cookie.Middleware())
+	router.Use(auth.Middleware())
 	router.Use(database.Middleware(db))
 	router.Use(stores.Middleware(store))
 	router.Use(loaders.Middleware(db))
-	router.Use(cookie.Middleware())
-	router.Use(auth.Middleware())
 
 	// TODO: Add IsUnAuthenticated directive
 	c := generated.Config{Resolvers: &resolvers.Resolver{}}

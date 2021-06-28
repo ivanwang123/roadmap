@@ -1,0 +1,6 @@
+type CheckpointStatus {
+  userId: Int!
+  checkpointId: Int!
+  roadmapId: Int!
+  status: String!
+}

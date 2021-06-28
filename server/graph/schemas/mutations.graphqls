@@ -1,16 +1,24 @@
 # MUTATIONS
 
 type Mutation {
+  login(input: Login!): User!
+  logout: Boolean! @isAuthenticated
   createUser(input: NewUser!): User! @isAuthenticated
   createCheckpoint(input: NewCheckpoint!): Checkpoint! @isAuthenticated
   createRoadmap(input: NewRoadmap!): Roadmap! @isAuthenticated
   toggleFollowRoadmap(input: FollowRoadmap!): Boolean! @isAuthenticated
-  login(input: Login!): User!
+  updateCheckpointStatus(input: UpdateStatus!): Checkpoint! @isAuthenticated
 }
 
 directive @isAuthenticated on FIELD_DEFINITION
 
 # INPUTS
+
+input Login {
+  username: String
+  email: String
+  password: String!
+}
 
 input NewUser {
   username: String!
@@ -21,6 +29,7 @@ input NewUser {
 input NewCheckpoint {
   title: String!
   instructions: String!
+  links: [String!]!
   roadmapId: Int!
 }
 
@@ -35,8 +44,7 @@ input FollowRoadmap {
   roadmapId: Int!
 }
 
-input Login {
-  username: String
-  email: String
-  password: String!
+input UpdateStatus {
+  checkpointId: Int!
+  status: String!
 }

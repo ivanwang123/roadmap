@@ -9,10 +9,16 @@ type Response = {
   };
 };
 
-export type ChildProps<TInputProps> = ChildDataProps<TInputProps, Response, {}>;
+export type AuthChildProps<TInputProps = {}> = ChildDataProps<
+  TInputProps,
+  Response,
+  {}
+>;
 
-function withAuth<TInputProps>() {
-  return graphql<TInputProps, Response, {}, ChildProps<TInputProps>>(ME_QUERY);
+function withAuth<TInputProps = {}>() {
+  return graphql<TInputProps, Response, {}, AuthChildProps<TInputProps>>(
+    ME_QUERY
+  );
 }
 
 export default withAuth;

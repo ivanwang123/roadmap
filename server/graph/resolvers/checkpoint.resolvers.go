@@ -11,6 +11,22 @@ import (
 	"github.com/ivanwang123/roadmap/server/loaders"
 )
 
+func (r *checkpointResolver) Links(ctx context.Context, obj *model.Checkpoint) ([]*model.Link, error) {
+	return obj.Links, nil
+}
+
+func (r *checkpointResolver) Status(ctx context.Context, obj *model.Checkpoint) (*string, error) {
+	checkpointStatus, err := loaders.ForContext(ctx).CheckpointStatus(obj.ID)
+	if err != nil {
+		return nil, err
+	}
+	if checkpointStatus == nil {
+		return nil, nil
+	}
+
+	return &checkpointStatus.Status, nil
+}
+
 func (r *checkpointResolver) Roadmap(ctx context.Context, obj *model.Checkpoint) (*model.Roadmap, error) {
 	return loaders.ForContext(ctx).RoadmapById(obj.RoadmapID)
 }

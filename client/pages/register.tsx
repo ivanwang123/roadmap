@@ -7,6 +7,7 @@ import Alert from "../components/Alert";
 import Layout from "../components/Layout";
 import { REGISTER_MUTATION } from "../graphql/mutations/register";
 import { ME_QUERY } from "../graphql/queries/me";
+import { getApolloClient } from "../lib/apollo-client";
 
 function Register() {
   const [signup] = useMutation(REGISTER_MUTATION);
@@ -28,17 +29,17 @@ function Register() {
           return;
         }
 
-        console.log("REGISTER DATA", data);
         cache.writeQuery({
           query: ME_QUERY,
           data: {
-            __typename: "Query",
             me: data.createUser,
           },
         });
       },
     })
       .then(() => {
+        const client = getApolloClient();
+        client.resetStore();
         if (Router.query.redirect !== undefined) {
           Router.push(Router.query.redirect as string);
         } else {

@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -22,6 +23,7 @@ func Middleware() func(http.Handler) http.Handler {
 			// no user or refresh cookie = noauth continue
 			var userId int
 			userCookie, err := r.Cookie("user")
+
 			if err != nil {
 				userId, err = RefreshToken(r)
 				if err != nil {
@@ -80,6 +82,7 @@ func RefreshToken(r *http.Request) (int, error) {
 
 func ForContext(ctx context.Context) int {
 	raw := ctx.Value(userIdCtxKey)
+	fmt.Println("AUTH RAW", raw)
 	if raw != nil {
 		return raw.(int)
 	} else {

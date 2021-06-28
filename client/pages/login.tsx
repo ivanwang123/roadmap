@@ -7,6 +7,8 @@ import { ME_QUERY } from "../graphql/queries/me";
 import { LOGIN_MUTATION } from "../graphql/mutations/login";
 import Link from "next/link";
 import Layout from "../components/Layout";
+import { getApolloClient } from "../lib/apollo-client";
+import Loader from "../svgs/loader.svg";
 
 function Login() {
   const [error, setError] = useState<boolean>(false);
@@ -18,7 +20,7 @@ function Login() {
     formState: { errors },
   } = useForm();
 
-  const [login] = useMutation(LOGIN_MUTATION);
+  const [login, { loading }] = useMutation(LOGIN_MUTATION);
 
   const onSubmit = (data: any) => {
     console.log("SUBMIT", data);
@@ -33,13 +35,14 @@ function Login() {
         cache.writeQuery({
           query: ME_QUERY,
           data: {
-            __typename: "Query",
             me: data.login,
           },
         });
       },
     })
       .then(() => {
+        const client = getApolloClient();
+        client.resetStore();
         if (Router.query.redirect !== undefined) {
           Router.push(Router.query.redirect as string);
         } else {
@@ -102,10 +105,6 @@ function Login() {
                 }`}
                 {...register("password", {
                   required: { value: true, message: "Password is required" },
-                  minLength: {
-                    value: 8,
-                    message: "Password must be at least 8 characters long",
-                  },
                 })}
               />
               <span className="h-6 text-red-500 mt-1">
@@ -115,9 +114,19 @@ function Login() {
 
             <button
               type="submit"
-              className="bg-green-500 text-white font-bold py-2 rounded"
+              className="icon-btn-grid items-center bg-green-500 text-white font-bold py-2 rounded disabled:opacity-70"
+              disabled={loading}
             >
-              Log in
+              <span className="justify-self-end">
+                {loading && (
+                  <Loader
+                    className="fill-current animate-spin mr-2"
+                    width={20}
+                    height={20}
+                  />
+                )}
+              </span>
+              <span>Log in</span>
             </button>
           </form>
           <div className="text-sm text-gray-500 text-center mt-6">

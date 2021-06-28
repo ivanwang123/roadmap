@@ -54,27 +54,43 @@ type ComplexityRoot struct {
 		CreatedAt    func(childComplexity int) int
 		ID           func(childComplexity int) int
 		Instructions func(childComplexity int) int
-		IsCompleted  func(childComplexity int) int
 		Links        func(childComplexity int) int
 		Roadmap      func(childComplexity int) int
+		Status       func(childComplexity int) int
 		Title        func(childComplexity int) int
 		UpdatedAt    func(childComplexity int) int
 	}
 
+	CheckpointStatus struct {
+		CheckpointID func(childComplexity int) int
+		RoadmapID    func(childComplexity int) int
+		Status       func(childComplexity int) int
+		UserID       func(childComplexity int) int
+	}
+
+	Link struct {
+		Description func(childComplexity int) int
+		Image       func(childComplexity int) int
+		Title       func(childComplexity int) int
+		URL         func(childComplexity int) int
+	}
+
 	Mutation struct {
-		CreateCheckpoint    func(childComplexity int, input model.NewCheckpoint) int
-		CreateRoadmap       func(childComplexity int, input model.NewRoadmap) int
-		CreateUser          func(childComplexity int, input model.NewUser) int
-		Login               func(childComplexity int, input model.Login) int
-		ToggleFollowRoadmap func(childComplexity int, input model.FollowRoadmap) int
+		CreateCheckpoint       func(childComplexity int, input model.NewCheckpoint) int
+		CreateRoadmap          func(childComplexity int, input model.NewRoadmap) int
+		CreateUser             func(childComplexity int, input model.NewUser) int
+		Login                  func(childComplexity int, input model.Login) int
+		Logout                 func(childComplexity int) int
+		ToggleFollowRoadmap    func(childComplexity int, input model.FollowRoadmap) int
+		UpdateCheckpointStatus func(childComplexity int, input model.UpdateStatus) int
 	}
 
 	Query struct {
-		AllRoadmaps func(childComplexity int) int
-		AllUsers    func(childComplexity int) int
-		Me          func(childComplexity int) int
-		OneRoadmap  func(childComplexity int, input *model.GetRoadmap) int
-		OneUser     func(childComplexity int, input *model.GetUser) int
+		Me       func(childComplexity int) int
+		Roadmap  func(childComplexity int, input *model.GetRoadmap) int
+		Roadmaps func(childComplexity int) int
+		User     func(childComplexity int, input *model.GetUser) int
+		Users    func(childComplexity int) int
 	}
 
 	Roadmap struct {
@@ -89,7 +105,6 @@ type ComplexityRoot struct {
 	}
 
 	RoadmapFollower struct {
-		ID      func(childComplexity int) int
 		Roadmap func(childComplexity int) int
 		User    func(childComplexity int) int
 	}
@@ -107,20 +122,24 @@ type ComplexityRoot struct {
 }
 
 type CheckpointResolver interface {
+	Links(ctx context.Context, obj *model.Checkpoint) ([]*model.Link, error)
+	Status(ctx context.Context, obj *model.Checkpoint) (*string, error)
 	Roadmap(ctx context.Context, obj *model.Checkpoint) (*model.Roadmap, error)
 }
 type MutationResolver interface {
+	Login(ctx context.Context, input model.Login) (*model.User, error)
+	Logout(ctx context.Context) (bool, error)
 	CreateUser(ctx context.Context, input model.NewUser) (*model.User, error)
 	CreateCheckpoint(ctx context.Context, input model.NewCheckpoint) (*model.Checkpoint, error)
 	CreateRoadmap(ctx context.Context, input model.NewRoadmap) (*model.Roadmap, error)
 	ToggleFollowRoadmap(ctx context.Context, input model.FollowRoadmap) (bool, error)
-	Login(ctx context.Context, input model.Login) (*model.User, error)
+	UpdateCheckpointStatus(ctx context.Context, input model.UpdateStatus) (*model.Checkpoint, error)
 }
 type QueryResolver interface {
-	OneUser(ctx context.Context, input *model.GetUser) (*model.User, error)
-	OneRoadmap(ctx context.Context, input *model.GetRoadmap) (*model.Roadmap, error)
-	AllUsers(ctx context.Context) ([]*model.User, error)
-	AllRoadmaps(ctx context.Context) ([]*model.Roadmap, error)
+	User(ctx context.Context, input *model.GetUser) (*model.User, error)
+	Roadmap(ctx context.Context, input *model.GetRoadmap) (*model.Roadmap, error)
+	Users(ctx context.Context) ([]*model.User, error)
+	Roadmaps(ctx context.Context) ([]*model.Roadmap, error)
 	Me(ctx context.Context) (*model.User, error)
 }
 type RoadmapResolver interface {
@@ -173,13 +192,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Checkpoint.Instructions(childComplexity), true
 
-	case "Checkpoint.isCompleted":
-		if e.complexity.Checkpoint.IsCompleted == nil {
-			break
-		}
-
-		return e.complexity.Checkpoint.IsCompleted(childComplexity), true
-
 	case "Checkpoint.links":
 		if e.complexity.Checkpoint.Links == nil {
 			break
@@ -194,6 +206,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Checkpoint.Roadmap(childComplexity), true
 
+	case "Checkpoint.status":
+		if e.complexity.Checkpoint.Status == nil {
+			break
+		}
+
+		return e.complexity.Checkpoint.Status(childComplexity), true
+
 	case "Checkpoint.title":
 		if e.complexity.Checkpoint.Title == nil {
 			break
@@ -207,6 +226,62 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Checkpoint.UpdatedAt(childComplexity), true
+
+	case "CheckpointStatus.checkpointId":
+		if e.complexity.CheckpointStatus.CheckpointID == nil {
+			break
+		}
+
+		return e.complexity.CheckpointStatus.CheckpointID(childComplexity), true
+
+	case "CheckpointStatus.roadmapId":
+		if e.complexity.CheckpointStatus.RoadmapID == nil {
+			break
+		}
+
+		return e.complexity.CheckpointStatus.RoadmapID(childComplexity), true
+
+	case "CheckpointStatus.status":
+		if e.complexity.CheckpointStatus.Status == nil {
+			break
+		}
+
+		return e.complexity.CheckpointStatus.Status(childComplexity), true
+
+	case "CheckpointStatus.userId":
+		if e.complexity.CheckpointStatus.UserID == nil {
+			break
+		}
+
+		return e.complexity.CheckpointStatus.UserID(childComplexity), true
+
+	case "Link.description":
+		if e.complexity.Link.Description == nil {
+			break
+		}
+
+		return e.complexity.Link.Description(childComplexity), true
+
+	case "Link.image":
+		if e.complexity.Link.Image == nil {
+			break
+		}
+
+		return e.complexity.Link.Image(childComplexity), true
+
+	case "Link.title":
+		if e.complexity.Link.Title == nil {
+			break
+		}
+
+		return e.complexity.Link.Title(childComplexity), true
+
+	case "Link.url":
+		if e.complexity.Link.URL == nil {
+			break
+		}
+
+		return e.complexity.Link.URL(childComplexity), true
 
 	case "Mutation.createCheckpoint":
 		if e.complexity.Mutation.CreateCheckpoint == nil {
@@ -256,6 +331,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.Login(childComplexity, args["input"].(model.Login)), true
 
+	case "Mutation.logout":
+		if e.complexity.Mutation.Logout == nil {
+			break
+		}
+
+		return e.complexity.Mutation.Logout(childComplexity), true
+
 	case "Mutation.toggleFollowRoadmap":
 		if e.complexity.Mutation.ToggleFollowRoadmap == nil {
 			break
@@ -268,19 +350,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.ToggleFollowRoadmap(childComplexity, args["input"].(model.FollowRoadmap)), true
 
-	case "Query.allRoadmaps":
-		if e.complexity.Query.AllRoadmaps == nil {
+	case "Mutation.updateCheckpointStatus":
+		if e.complexity.Mutation.UpdateCheckpointStatus == nil {
 			break
 		}
 
-		return e.complexity.Query.AllRoadmaps(childComplexity), true
-
-	case "Query.allUsers":
-		if e.complexity.Query.AllUsers == nil {
-			break
+		args, err := ec.field_Mutation_updateCheckpointStatus_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
 		}
 
-		return e.complexity.Query.AllUsers(childComplexity), true
+		return e.complexity.Mutation.UpdateCheckpointStatus(childComplexity, args["input"].(model.UpdateStatus)), true
 
 	case "Query.me":
 		if e.complexity.Query.Me == nil {
@@ -289,29 +369,43 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Me(childComplexity), true
 
-	case "Query.oneRoadmap":
-		if e.complexity.Query.OneRoadmap == nil {
+	case "Query.roadmap":
+		if e.complexity.Query.Roadmap == nil {
 			break
 		}
 
-		args, err := ec.field_Query_oneRoadmap_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_roadmap_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Query.OneRoadmap(childComplexity, args["input"].(*model.GetRoadmap)), true
+		return e.complexity.Query.Roadmap(childComplexity, args["input"].(*model.GetRoadmap)), true
 
-	case "Query.oneUser":
-		if e.complexity.Query.OneUser == nil {
+	case "Query.roadmaps":
+		if e.complexity.Query.Roadmaps == nil {
 			break
 		}
 
-		args, err := ec.field_Query_oneUser_args(context.TODO(), rawArgs)
+		return e.complexity.Query.Roadmaps(childComplexity), true
+
+	case "Query.user":
+		if e.complexity.Query.User == nil {
+			break
+		}
+
+		args, err := ec.field_Query_user_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Query.OneUser(childComplexity, args["input"].(*model.GetUser)), true
+		return e.complexity.Query.User(childComplexity, args["input"].(*model.GetUser)), true
+
+	case "Query.users":
+		if e.complexity.Query.Users == nil {
+			break
+		}
+
+		return e.complexity.Query.Users(childComplexity), true
 
 	case "Roadmap.checkpoints":
 		if e.complexity.Roadmap.Checkpoints == nil {
@@ -368,13 +462,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Roadmap.UpdatedAt(childComplexity), true
-
-	case "RoadmapFollower.id":
-		if e.complexity.RoadmapFollower.ID == nil {
-			break
-		}
-
-		return e.complexity.RoadmapFollower.ID(childComplexity), true
 
 	case "RoadmapFollower.roadmap":
 		if e.complexity.RoadmapFollower.Roadmap == nil {
@@ -514,26 +601,48 @@ var sources = []*ast.Source{
   id: ID!
   title: String!
   instructions: String!
-  links: [String!]!
-  isCompleted: Boolean
+  links: [Link!]!
+  status: String
   roadmap: Roadmap!
   createdAt: Time!
   updatedAt: Time!
+}
+
+type Link {
+  url: String!
+  title: String!
+  description: String!
+  image: String!
+}
+`, BuiltIn: false},
+	{Name: "graph/schemas/checkpoint_status.graphqls", Input: `type CheckpointStatus {
+  userId: Int!
+  checkpointId: Int!
+  roadmapId: Int!
+  status: String!
 }
 `, BuiltIn: false},
 	{Name: "graph/schemas/mutations.graphqls", Input: `# MUTATIONS
 
 type Mutation {
+  login(input: Login!): User!
+  logout: Boolean! @isAuthenticated
   createUser(input: NewUser!): User! @isAuthenticated
   createCheckpoint(input: NewCheckpoint!): Checkpoint! @isAuthenticated
   createRoadmap(input: NewRoadmap!): Roadmap! @isAuthenticated
   toggleFollowRoadmap(input: FollowRoadmap!): Boolean! @isAuthenticated
-  login(input: Login!): User!
+  updateCheckpointStatus(input: UpdateStatus!): Checkpoint! @isAuthenticated
 }
 
 directive @isAuthenticated on FIELD_DEFINITION
 
 # INPUTS
+
+input Login {
+  username: String
+  email: String
+  password: String!
+}
 
 input NewUser {
   username: String!
@@ -544,6 +653,7 @@ input NewUser {
 input NewCheckpoint {
   title: String!
   instructions: String!
+  links: [String!]!
   roadmapId: Int!
 }
 
@@ -558,30 +668,29 @@ input FollowRoadmap {
   roadmapId: Int!
 }
 
-input Login {
-  username: String
-  email: String
-  password: String!
+input UpdateStatus {
+  checkpointId: Int!
+  status: String!
 }
 `, BuiltIn: false},
 	{Name: "graph/schemas/queries.graphqls", Input: `# QUERIES
 
 type Query {
-  oneUser(input: GetUser): User!
-  oneRoadmap(input: GetRoadmap): Roadmap!
-  allUsers: [User!]!
-  allRoadmaps: [Roadmap!]!
+  user(input: GetUser): User!
+  roadmap(input: GetRoadmap): Roadmap!
+  users: [User!]!
+  roadmaps: [Roadmap!]!
   me: User @isAuthenticated
 }
 
 # INPUTS
 
 input GetUser {
-  userId: Int!
+  id: Int!
 }
 
 input GetRoadmap {
-  roadmapId: Int!
+  id: Int!
 }
 `, BuiltIn: false},
 	{Name: "graph/schemas/roadmap.graphqls", Input: `type Roadmap {
@@ -596,7 +705,6 @@ input GetRoadmap {
 }
 `, BuiltIn: false},
 	{Name: "graph/schemas/roadmap_follower.graphqls", Input: `type RoadmapFollower {
-  id: ID!
   user: User!
   roadmap: Roadmap!
 }
@@ -696,6 +804,21 @@ func (ec *executionContext) field_Mutation_toggleFollowRoadmap_args(ctx context.
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_updateCheckpointStatus_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.UpdateStatus
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNUpdateStatus2githubᚗcomᚋivanwang123ᚋroadmapᚋserverᚋgraphᚋmodelᚐUpdateStatus(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -711,7 +834,7 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_oneRoadmap_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_roadmap_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 *model.GetRoadmap
@@ -726,7 +849,7 @@ func (ec *executionContext) field_Query_oneRoadmap_args(ctx context.Context, raw
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_oneUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_user_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 *model.GetUser
@@ -895,14 +1018,14 @@ func (ec *executionContext) _Checkpoint_links(ctx context.Context, field graphql
 		Object:     "Checkpoint",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Links, nil
+		return ec.resolvers.Checkpoint().Links(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -914,12 +1037,12 @@ func (ec *executionContext) _Checkpoint_links(ctx context.Context, field graphql
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]string)
+	res := resTmp.([]*model.Link)
 	fc.Result = res
-	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
+	return ec.marshalNLink2ᚕᚖgithubᚗcomᚋivanwang123ᚋroadmapᚋserverᚋgraphᚋmodelᚐLinkᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Checkpoint_isCompleted(ctx context.Context, field graphql.CollectedField, obj *model.Checkpoint) (ret graphql.Marshaler) {
+func (ec *executionContext) _Checkpoint_status(ctx context.Context, field graphql.CollectedField, obj *model.Checkpoint) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -930,14 +1053,14 @@ func (ec *executionContext) _Checkpoint_isCompleted(ctx context.Context, field g
 		Object:     "Checkpoint",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.IsCompleted, nil
+		return ec.resolvers.Checkpoint().Status(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -946,9 +1069,9 @@ func (ec *executionContext) _Checkpoint_isCompleted(ctx context.Context, field g
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*bool)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Checkpoint_roadmap(ctx context.Context, field graphql.CollectedField, obj *model.Checkpoint) (ret graphql.Marshaler) {
@@ -1054,6 +1177,383 @@ func (ec *executionContext) _Checkpoint_updatedAt(ctx context.Context, field gra
 	res := resTmp.(time.Time)
 	fc.Result = res
 	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CheckpointStatus_userId(ctx context.Context, field graphql.CollectedField, obj *model.CheckpointStatus) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "CheckpointStatus",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UserID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CheckpointStatus_checkpointId(ctx context.Context, field graphql.CollectedField, obj *model.CheckpointStatus) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "CheckpointStatus",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CheckpointID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CheckpointStatus_roadmapId(ctx context.Context, field graphql.CollectedField, obj *model.CheckpointStatus) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "CheckpointStatus",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RoadmapID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CheckpointStatus_status(ctx context.Context, field graphql.CollectedField, obj *model.CheckpointStatus) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "CheckpointStatus",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Link_url(ctx context.Context, field graphql.CollectedField, obj *model.Link) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Link",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.URL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Link_title(ctx context.Context, field graphql.CollectedField, obj *model.Link) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Link",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Title, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Link_description(ctx context.Context, field graphql.CollectedField, obj *model.Link) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Link",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Description, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Link_image(ctx context.Context, field graphql.CollectedField, obj *model.Link) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Link",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Image, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_login_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().Login(rctx, args["input"].(model.Login))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖgithubᚗcomᚋivanwang123ᚋroadmapᚋserverᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_logout(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().Logout(rctx)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.IsAuthenticated == nil {
+				return nil, errors.New("directive isAuthenticated is not implemented")
+			}
+			return ec.directives.IsAuthenticated(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(bool); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_createUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1304,7 +1804,7 @@ func (ec *executionContext) _Mutation_toggleFollowRoadmap(ctx context.Context, f
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Mutation_updateCheckpointStatus(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1321,15 +1821,35 @@ func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.C
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_login_args(ctx, rawArgs)
+	args, err := ec.field_Mutation_updateCheckpointStatus_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().Login(rctx, args["input"].(model.Login))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UpdateCheckpointStatus(rctx, args["input"].(model.UpdateStatus))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.IsAuthenticated == nil {
+				return nil, errors.New("directive isAuthenticated is not implemented")
+			}
+			return ec.directives.IsAuthenticated(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.Checkpoint); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/ivanwang123/roadmap/server/graph/model.Checkpoint`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1341,12 +1861,12 @@ func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.User)
+	res := resTmp.(*model.Checkpoint)
 	fc.Result = res
-	return ec.marshalNUser2ᚖgithubᚗcomᚋivanwang123ᚋroadmapᚋserverᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+	return ec.marshalNCheckpoint2ᚖgithubᚗcomᚋivanwang123ᚋroadmapᚋserverᚋgraphᚋmodelᚐCheckpoint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Query_oneUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Query_user(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1363,7 +1883,7 @@ func (ec *executionContext) _Query_oneUser(ctx context.Context, field graphql.Co
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_oneUser_args(ctx, rawArgs)
+	args, err := ec.field_Query_user_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -1371,7 +1891,7 @@ func (ec *executionContext) _Query_oneUser(ctx context.Context, field graphql.Co
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().OneUser(rctx, args["input"].(*model.GetUser))
+		return ec.resolvers.Query().User(rctx, args["input"].(*model.GetUser))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1388,7 +1908,7 @@ func (ec *executionContext) _Query_oneUser(ctx context.Context, field graphql.Co
 	return ec.marshalNUser2ᚖgithubᚗcomᚋivanwang123ᚋroadmapᚋserverᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Query_oneRoadmap(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Query_roadmap(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1405,7 +1925,7 @@ func (ec *executionContext) _Query_oneRoadmap(ctx context.Context, field graphql
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_oneRoadmap_args(ctx, rawArgs)
+	args, err := ec.field_Query_roadmap_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -1413,7 +1933,7 @@ func (ec *executionContext) _Query_oneRoadmap(ctx context.Context, field graphql
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().OneRoadmap(rctx, args["input"].(*model.GetRoadmap))
+		return ec.resolvers.Query().Roadmap(rctx, args["input"].(*model.GetRoadmap))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1430,7 +1950,7 @@ func (ec *executionContext) _Query_oneRoadmap(ctx context.Context, field graphql
 	return ec.marshalNRoadmap2ᚖgithubᚗcomᚋivanwang123ᚋroadmapᚋserverᚋgraphᚋmodelᚐRoadmap(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Query_allUsers(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Query_users(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1448,7 +1968,7 @@ func (ec *executionContext) _Query_allUsers(ctx context.Context, field graphql.C
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().AllUsers(rctx)
+		return ec.resolvers.Query().Users(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1465,7 +1985,7 @@ func (ec *executionContext) _Query_allUsers(ctx context.Context, field graphql.C
 	return ec.marshalNUser2ᚕᚖgithubᚗcomᚋivanwang123ᚋroadmapᚋserverᚋgraphᚋmodelᚐUserᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Query_allRoadmaps(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Query_roadmaps(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1483,7 +2003,7 @@ func (ec *executionContext) _Query_allRoadmaps(ctx context.Context, field graphq
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().AllRoadmaps(rctx)
+		return ec.resolvers.Query().Roadmaps(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1901,41 +2421,6 @@ func (ec *executionContext) _Roadmap_updatedAt(ctx context.Context, field graphq
 	res := resTmp.(time.Time)
 	fc.Result = res
 	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _RoadmapFollower_id(ctx context.Context, field graphql.CollectedField, obj *model.RoadmapFollower) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "RoadmapFollower",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNID2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _RoadmapFollower_user(ctx context.Context, field graphql.CollectedField, obj *model.RoadmapFollower) (ret graphql.Marshaler) {
@@ -3409,11 +3894,11 @@ func (ec *executionContext) unmarshalInputGetRoadmap(ctx context.Context, obj in
 
 	for k, v := range asMap {
 		switch k {
-		case "roadmapId":
+		case "id":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("roadmapId"))
-			it.RoadmapID, err = ec.unmarshalNInt2int(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3429,11 +3914,11 @@ func (ec *executionContext) unmarshalInputGetUser(ctx context.Context, obj inter
 
 	for k, v := range asMap {
 		switch k {
-		case "userId":
+		case "id":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userId"))
-			it.UserID, err = ec.unmarshalNInt2int(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3498,6 +3983,14 @@ func (ec *executionContext) unmarshalInputNewCheckpoint(ctx context.Context, obj
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("instructions"))
 			it.Instructions, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "links":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("links"))
+			it.Links, err = ec.unmarshalNString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3587,6 +4080,34 @@ func (ec *executionContext) unmarshalInputNewUser(ctx context.Context, obj inter
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateStatus(ctx context.Context, obj interface{}) (model.UpdateStatus, error) {
+	var it model.UpdateStatus
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "checkpointId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("checkpointId"))
+			it.CheckpointID, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "status":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			it.Status, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -3622,12 +4143,30 @@ func (ec *executionContext) _Checkpoint(ctx context.Context, sel ast.SelectionSe
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "links":
-			out.Values[i] = ec._Checkpoint_links(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
-		case "isCompleted":
-			out.Values[i] = ec._Checkpoint_isCompleted(ctx, field, obj)
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Checkpoint_links(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "status":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Checkpoint_status(ctx, field, obj)
+				return res
+			})
 		case "roadmap":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -3663,6 +4202,90 @@ func (ec *executionContext) _Checkpoint(ctx context.Context, sel ast.SelectionSe
 	return out
 }
 
+var checkpointStatusImplementors = []string{"CheckpointStatus"}
+
+func (ec *executionContext) _CheckpointStatus(ctx context.Context, sel ast.SelectionSet, obj *model.CheckpointStatus) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, checkpointStatusImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CheckpointStatus")
+		case "userId":
+			out.Values[i] = ec._CheckpointStatus_userId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "checkpointId":
+			out.Values[i] = ec._CheckpointStatus_checkpointId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "roadmapId":
+			out.Values[i] = ec._CheckpointStatus_roadmapId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "status":
+			out.Values[i] = ec._CheckpointStatus_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var linkImplementors = []string{"Link"}
+
+func (ec *executionContext) _Link(ctx context.Context, sel ast.SelectionSet, obj *model.Link) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, linkImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Link")
+		case "url":
+			out.Values[i] = ec._Link_url(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "title":
+			out.Values[i] = ec._Link_title(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "description":
+			out.Values[i] = ec._Link_description(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "image":
+			out.Values[i] = ec._Link_image(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var mutationImplementors = []string{"Mutation"}
 
 func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -3678,6 +4301,16 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
+		case "login":
+			out.Values[i] = ec._Mutation_login(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "logout":
+			out.Values[i] = ec._Mutation_logout(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "createUser":
 			out.Values[i] = ec._Mutation_createUser(ctx, field)
 			if out.Values[i] == graphql.Null {
@@ -3698,8 +4331,8 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "login":
-			out.Values[i] = ec._Mutation_login(ctx, field)
+		case "updateCheckpointStatus":
+			out.Values[i] = ec._Mutation_updateCheckpointStatus(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -3729,7 +4362,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
-		case "oneUser":
+		case "user":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
 				defer func() {
@@ -3737,13 +4370,13 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_oneUser(ctx, field)
+				res = ec._Query_user(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
 			})
-		case "oneRoadmap":
+		case "roadmap":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
 				defer func() {
@@ -3751,13 +4384,13 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_oneRoadmap(ctx, field)
+				res = ec._Query_roadmap(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
 			})
-		case "allUsers":
+		case "users":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
 				defer func() {
@@ -3765,13 +4398,13 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_allUsers(ctx, field)
+				res = ec._Query_users(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
 			})
-		case "allRoadmaps":
+		case "roadmaps":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
 				defer func() {
@@ -3779,7 +4412,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_allRoadmaps(ctx, field)
+				res = ec._Query_roadmaps(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -3911,11 +4544,6 @@ func (ec *executionContext) _RoadmapFollower(ctx context.Context, sel ast.Select
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("RoadmapFollower")
-		case "id":
-			out.Values[i] = ec._RoadmapFollower_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
 		case "user":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -4381,6 +5009,53 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
+func (ec *executionContext) marshalNLink2ᚕᚖgithubᚗcomᚋivanwang123ᚋroadmapᚋserverᚋgraphᚋmodelᚐLinkᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Link) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNLink2ᚖgithubᚗcomᚋivanwang123ᚋroadmapᚋserverᚋgraphᚋmodelᚐLink(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalNLink2ᚖgithubᚗcomᚋivanwang123ᚋroadmapᚋserverᚋgraphᚋmodelᚐLink(ctx context.Context, sel ast.SelectionSet, v *model.Link) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Link(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNLogin2githubᚗcomᚋivanwang123ᚋroadmapᚋserverᚋgraphᚋmodelᚐLogin(ctx context.Context, v interface{}) (model.Login, error) {
 	res, err := ec.unmarshalInputLogin(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -4510,6 +5185,11 @@ func (ec *executionContext) marshalNTime2timeᚐTime(ctx context.Context, sel as
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNUpdateStatus2githubᚗcomᚋivanwang123ᚋroadmapᚋserverᚋgraphᚋmodelᚐUpdateStatus(ctx context.Context, v interface{}) (model.UpdateStatus, error) {
+	res, err := ec.unmarshalInputUpdateStatus(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNUser2githubᚗcomᚋivanwang123ᚋroadmapᚋserverᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v model.User) graphql.Marshaler {

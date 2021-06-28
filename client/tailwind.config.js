@@ -14,11 +14,15 @@ module.exports = {
         135: "135deg",
         105: "105deg",
       },
+      borderWidth: {
+        3: "3px",
+      },
     },
   },
   variants: {
     extend: {
       borderWidth: ["hover"],
+      opacity: ["disabled"],
     },
   },
   plugins: [require("@tailwindcss/line-clamp")],

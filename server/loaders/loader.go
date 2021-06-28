@@ -15,10 +15,11 @@ import (
 const loaderCtxKey = "loader"
 
 type Loader struct {
-	UserById               func(userId int) (*model.User, error)
-	UserByRoadmapFollowing func(roadmapId int) ([]*model.User, error)
-	RoadmapById            func(roadmapId int) (*model.Roadmap, error)
-	RoadmapByFollower      func(userId int) ([]*model.Roadmap, error)
+	UserById               func(int) (*model.User, error)
+	UserByRoadmapFollowing func(int) ([]*model.User, error)
+	RoadmapById            func(int) (*model.Roadmap, error)
+	RoadmapByFollower      func(int) ([]*model.Roadmap, error)
+	CheckpointStatus       func(int) (*model.CheckpointStatus, error)
 }
 
 func Middleware(db *sqlx.DB) func(http.Handler) http.Handler {
@@ -29,6 +30,7 @@ func Middleware(db *sqlx.DB) func(http.Handler) http.Handler {
 				UserByRoadmapFollowing: UserByRoadmapFollowing(r.Context()),
 				RoadmapById:            RoadmapById(r.Context()),
 				RoadmapByFollower:      RoadmapByFollower(r.Context()),
+				CheckpointStatus:       CheckpointStatus(r.Context()),
 			}
 			ctx := context.WithValue(r.Context(), loaderCtxKey, loader)
 

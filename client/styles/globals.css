@@ -32,6 +32,16 @@ h6 {
   grid-template-columns: auto 1fr;
 }
 
+.checkpoints-grid {
+  display: grid;
+  grid-template-columns: 2rem 1fr;
+}
+
+.icon-btn-grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+}
+
 .rotate-arrow {
   transform: rotate(45deg) scaleX(-1);
 }

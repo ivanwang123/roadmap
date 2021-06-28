@@ -15,4 +15,14 @@
 - GraphQL
 - Go
 - Gqlgen
-- Dataloaden
+- Dataloader
+- Cypress
+
+# PAGES
+
+/
+/explore
+/login
+/register
+/map/[id]
+/user/[id]

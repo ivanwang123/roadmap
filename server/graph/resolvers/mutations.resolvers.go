@@ -15,22 +15,6 @@ import (
 	"github.com/ivanwang123/roadmap/server/stores"
 )
 
-func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
-	return stores.ForContext(ctx).UserStore.Create(&input)
-}
-
-func (r *mutationResolver) CreateCheckpoint(ctx context.Context, input model.NewCheckpoint) (*model.Checkpoint, error) {
-	return stores.ForContext(ctx).CheckpointStore.Create(&input)
-}
-
-func (r *mutationResolver) CreateRoadmap(ctx context.Context, input model.NewRoadmap) (*model.Roadmap, error) {
-	return stores.ForContext(ctx).RoadmapStore.Create(&input)
-}
-
-func (r *mutationResolver) ToggleFollowRoadmap(ctx context.Context, input model.FollowRoadmap) (bool, error) {
-	return stores.ForContext(ctx).RoadmapFollowerStore.ToggleFollowRoadmap(&input)
-}
-
 func (r *mutationResolver) Login(ctx context.Context, input model.Login) (*model.User, error) {
 	user, err := stores.ForContext(ctx).UserStore.Authenticate(&input)
 	if err != nil {
@@ -51,6 +35,35 @@ func (r *mutationResolver) Login(ctx context.Context, input model.Login) (*model
 	fmt.Println("LOGIN SET COOKIES")
 
 	return user, nil
+}
+
+func (r *mutationResolver) Logout(ctx context.Context) (bool, error) {
+	cookie.ForContext(ctx).SetCookie("user", "", -time.Second)
+	cookie.ForContext(ctx).SetCookie("refresh", "", -time.Second)
+	fmt.Println("LOGOUT")
+	return true, nil
+}
+
+func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
+	return stores.ForContext(ctx).UserStore.Create(&input)
+}
+
+func (r *mutationResolver) CreateCheckpoint(ctx context.Context, input model.NewCheckpoint) (*model.Checkpoint, error) {
+	return stores.ForContext(ctx).CheckpointStore.Create(&input)
+}
+
+func (r *mutationResolver) CreateRoadmap(ctx context.Context, input model.NewRoadmap) (*model.Roadmap, error) {
+	return stores.ForContext(ctx).RoadmapStore.Create(&input)
+}
+
+func (r *mutationResolver) ToggleFollowRoadmap(ctx context.Context, input model.FollowRoadmap) (bool, error) {
+	// userId := auth.ForContext(ctx)
+	return stores.ForContext(ctx).RoadmapFollowerStore.ToggleFollowRoadmap(&input)
+}
+
+func (r *mutationResolver) UpdateCheckpointStatus(ctx context.Context, input model.UpdateStatus) (*model.Checkpoint, error) {
+	userId := auth.ForContext(ctx)
+	return stores.ForContext(ctx).UpdateStatus(userId, &input)
 }
 
 // Mutation returns generated.MutationResolver implementation.

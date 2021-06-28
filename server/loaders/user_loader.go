@@ -45,6 +45,7 @@ func userByIdBatchFn(ctx context.Context, keys dataloader.Keys) []*dataloader.Re
 
 func UserByRoadmapFollowing(ctx context.Context) func(int) ([]*model.User, error) {
 	loader := dataloader.NewBatchedLoader(userByRoadmapFollowingBatchFn)
+
 	return func(roadmapId int) ([]*model.User, error) {
 		result, err := loader.Load(ctx, dataloader.StringKey(strconv.Itoa(roadmapId)))()
 		if err != nil {
