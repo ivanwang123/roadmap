@@ -2,6 +2,12 @@
 
 package model
 
+import (
+	"fmt"
+	"io"
+	"strconv"
+)
+
 type CheckpointStatus struct {
 	UserID       int    `json:"userId"`
 	CheckpointID int    `json:"checkpointId"`
@@ -16,6 +22,11 @@ type FollowRoadmap struct {
 
 type GetRoadmap struct {
 	ID int `json:"id"`
+}
+
+type GetRoadmaps struct {
+	Cursor string `json:"cursor"`
+	Sort   Sort   `json:"sort"`
 }
 
 type GetUser struct {
@@ -50,4 +61,51 @@ type NewUser struct {
 type UpdateStatus struct {
 	CheckpointID int    `json:"checkpointId"`
 	Status       string `json:"status"`
+}
+
+type Sort string
+
+const (
+	SortNewest           Sort = "NEWEST"
+	SortOldest           Sort = "OLDEST"
+	SortMostFollowers    Sort = "MOST_FOLLOWERS"
+	SortMostCheckpoints  Sort = "MOST_CHECKPOINTS"
+	SortLeastCheckpoints Sort = "LEAST_CHECKPOINTS"
+)
+
+var AllSort = []Sort{
+	SortNewest,
+	SortOldest,
+	SortMostFollowers,
+	SortMostCheckpoints,
+	SortLeastCheckpoints,
+}
+
+func (e Sort) IsValid() bool {
+	switch e {
+	case SortNewest, SortOldest, SortMostFollowers, SortMostCheckpoints, SortLeastCheckpoints:
+		return true
+	}
+	return false
+}
+
+func (e Sort) String() string {
+	return string(e)
+}
+
+func (e *Sort) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = Sort(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid Sort", str)
+	}
+	return nil
+}
+
+func (e Sort) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }

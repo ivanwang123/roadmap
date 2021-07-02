@@ -4,8 +4,16 @@ type Query {
   user(input: GetUser): User!
   roadmap(input: GetRoadmap): Roadmap!
   users: [User!]!
-  roadmaps: [Roadmap!]!
+  roadmaps(input: GetRoadmaps): [Roadmap!]!
   me: User @isAuthenticated
+}
+
+enum Sort {
+  NEWEST
+  OLDEST
+  MOST_FOLLOWERS
+  MOST_CHECKPOINTS
+  LEAST_CHECKPOINTS
 }
 
 # INPUTS
@@ -16,4 +24,9 @@ input GetUser {
 
 input GetRoadmap {
   id: Int!
+}
+
+input GetRoadmaps {
+  cursor: String!
+  sort: Sort!
 }

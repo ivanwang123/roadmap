@@ -5,6 +5,7 @@ package resolvers
 
 import (
 	"context"
+	"errors"
 
 	"github.com/ivanwang123/roadmap/server/auth"
 	"github.com/ivanwang123/roadmap/server/graph/generated"
@@ -24,8 +25,21 @@ func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 	return stores.ForContext(ctx).UserStore.GetAll()
 }
 
-func (r *queryResolver) Roadmaps(ctx context.Context) ([]*model.Roadmap, error) {
-	return stores.ForContext(ctx).RoadmapStore.GetAll()
+func (r *queryResolver) Roadmaps(ctx context.Context, input *model.GetRoadmaps) ([]*model.Roadmap, error) {
+	switch input.Sort {
+	case model.SortNewest:
+		return stores.ForContext(ctx).RoadmapStore.GetByNewest(input.Cursor)
+	case model.SortOldest:
+		return stores.ForContext(ctx).RoadmapStore.GetByOldest(input.Cursor)
+	case model.SortMostFollowers:
+		return stores.ForContext(ctx).RoadmapStore.GetByMostFollowers(input.Cursor)
+	case model.SortMostCheckpoints:
+		return stores.ForContext(ctx).RoadmapStore.GetByMostCheckpoints(input.Cursor)
+	case model.SortLeastCheckpoints:
+		return stores.ForContext(ctx).RoadmapStore.GetByLeastCheckpoints(input.Cursor)
+	default:
+		return nil, errors.New("Invalid sort option")
+	}
 }
 
 func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {

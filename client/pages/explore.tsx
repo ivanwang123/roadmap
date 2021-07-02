@@ -6,7 +6,11 @@ import RoadmapCard from "../components/RoadmapCard";
 import { ROADMAPS_QUERY } from "../graphql/queries/roadmaps";
 
 function Explore() {
-  const { data, loading, error } = useQuery(ROADMAPS_QUERY);
+  const { data, loading, error } = useQuery(ROADMAPS_QUERY, {
+    variables: {
+      sort: "NEWEST",
+    },
+  });
 
   if (loading) return <Loading />;
   if (error) return <h1>Error</h1>;

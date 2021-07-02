@@ -29,7 +29,7 @@ func (s *UserStore) Create(input *model.NewUser) (*model.User, error) {
 func (s *UserStore) GetAll() ([]*model.User, error) {
 	users := []*model.User{}
 	if err := s.Select(&users, "SELECT * FROM users"); err != nil {
-		return []*model.User{}, err
+		return nil, err
 	}
 	return users, nil
 }

@@ -21,16 +21,38 @@ function createApolloClient() {
       credentials: "include", // Additional fetch() options like `credentials` or `headers`
     }),
     cache: new InMemoryCache({
-      // typePolicies is not required to use Apollo with Next.js - only for doing pagination.
-      // typePolicies: {
-      //   Query: {
-      //     fields: {
-      //       posts: relayStylePagination(),
-      //     },
-      //   },
-      // },
+      typePolicies: {
+        Query: {
+          fields: {
+            roadmaps: {
+              keyArgs: ["type", "sort"],
+              merge(existing, incoming, { args: { cursor } }: any) {
+                const merged = existing ? existing.slice(0) : [];
+                let offset = offsetFromCursor(merged, cursor);
+
+                for (let i = 0; i < incoming.length; i++) {
+                  merged[offset + i] = incoming[i];
+                }
+
+                return merged;
+              },
+            },
+          },
+        },
+      },
     }),
   });
+}
+
+// TODO: Change depending on cursor value
+function offsetFromCursor(items: any[], cursor: number) {
+  for (let i = items.length - 1; i >= 0; i--) {
+    if (items[i].id === cursor) {
+      return i + 1;
+    }
+  }
+
+  return items.length;
 }
 
 function initializeApollo(initialState: NormalizedCacheObject | null = null) {
@@ -84,6 +106,8 @@ export function useApollo(pageProps: any) {
   const store = useMemo(() => initializeApollo(state), [state]);
   return store;
 }
+
+// TODO: Deprecated
 
 // import {
 //   ApolloClient,

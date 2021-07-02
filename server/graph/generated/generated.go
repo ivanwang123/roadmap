@@ -88,7 +88,7 @@ type ComplexityRoot struct {
 	Query struct {
 		Me       func(childComplexity int) int
 		Roadmap  func(childComplexity int, input *model.GetRoadmap) int
-		Roadmaps func(childComplexity int) int
+		Roadmaps func(childComplexity int, input *model.GetRoadmaps) int
 		User     func(childComplexity int, input *model.GetUser) int
 		Users    func(childComplexity int) int
 	}
@@ -139,7 +139,7 @@ type QueryResolver interface {
 	User(ctx context.Context, input *model.GetUser) (*model.User, error)
 	Roadmap(ctx context.Context, input *model.GetRoadmap) (*model.Roadmap, error)
 	Users(ctx context.Context) ([]*model.User, error)
-	Roadmaps(ctx context.Context) ([]*model.Roadmap, error)
+	Roadmaps(ctx context.Context, input *model.GetRoadmaps) ([]*model.Roadmap, error)
 	Me(ctx context.Context) (*model.User, error)
 }
 type RoadmapResolver interface {
@@ -386,7 +386,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Query.Roadmaps(childComplexity), true
+		args, err := ec.field_Query_roadmaps_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Roadmaps(childComplexity, args["input"].(*model.GetRoadmaps)), true
 
 	case "Query.user":
 		if e.complexity.Query.User == nil {
@@ -679,8 +684,16 @@ type Query {
   user(input: GetUser): User!
   roadmap(input: GetRoadmap): Roadmap!
   users: [User!]!
-  roadmaps: [Roadmap!]!
+  roadmaps(input: GetRoadmaps): [Roadmap!]!
   me: User @isAuthenticated
+}
+
+enum Sort {
+  NEWEST
+  OLDEST
+  MOST_FOLLOWERS
+  MOST_CHECKPOINTS
+  LEAST_CHECKPOINTS
 }
 
 # INPUTS
@@ -691,6 +704,11 @@ input GetUser {
 
 input GetRoadmap {
   id: Int!
+}
+
+input GetRoadmaps {
+  cursor: String!
+  sort: Sort!
 }
 `, BuiltIn: false},
 	{Name: "graph/schemas/roadmap.graphqls", Input: `type Roadmap {
@@ -841,6 +859,21 @@ func (ec *executionContext) field_Query_roadmap_args(ctx context.Context, rawArg
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalOGetRoadmap2ᚖgithubᚗcomᚋivanwang123ᚋroadmapᚋserverᚋgraphᚋmodelᚐGetRoadmap(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_roadmaps_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.GetRoadmaps
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalOGetRoadmaps2ᚖgithubᚗcomᚋivanwang123ᚋroadmapᚋserverᚋgraphᚋmodelᚐGetRoadmaps(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2001,9 +2034,16 @@ func (ec *executionContext) _Query_roadmaps(ctx context.Context, field graphql.C
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_roadmaps_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Roadmaps(rctx)
+		return ec.resolvers.Query().Roadmaps(rctx, args["input"].(*model.GetRoadmaps))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3908,6 +3948,34 @@ func (ec *executionContext) unmarshalInputGetRoadmap(ctx context.Context, obj in
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputGetRoadmaps(ctx context.Context, obj interface{}) (model.GetRoadmaps, error) {
+	var it model.GetRoadmaps
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "cursor":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("cursor"))
+			it.Cursor, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "sort":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sort"))
+			it.Sort, err = ec.unmarshalNSort2githubᚗcomᚋivanwang123ᚋroadmapᚋserverᚋgraphᚋmodelᚐSort(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputGetUser(ctx context.Context, obj interface{}) (model.GetUser, error) {
 	var it model.GetUser
 	var asMap = obj.(map[string]interface{})
@@ -5127,6 +5195,16 @@ func (ec *executionContext) marshalNRoadmap2ᚖgithubᚗcomᚋivanwang123ᚋroad
 	return ec._Roadmap(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNSort2githubᚗcomᚋivanwang123ᚋroadmapᚋserverᚋgraphᚋmodelᚐSort(ctx context.Context, v interface{}) (model.Sort, error) {
+	var res model.Sort
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNSort2githubᚗcomᚋivanwang123ᚋroadmapᚋserverᚋgraphᚋmodelᚐSort(ctx context.Context, sel ast.SelectionSet, v model.Sort) graphql.Marshaler {
+	return v
+}
+
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -5501,6 +5579,14 @@ func (ec *executionContext) unmarshalOGetRoadmap2ᚖgithubᚗcomᚋivanwang123�
 		return nil, nil
 	}
 	res, err := ec.unmarshalInputGetRoadmap(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOGetRoadmaps2ᚖgithubᚗcomᚋivanwang123ᚋroadmapᚋserverᚋgraphᚋmodelᚐGetRoadmaps(ctx context.Context, v interface{}) (*model.GetRoadmaps, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputGetRoadmaps(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 

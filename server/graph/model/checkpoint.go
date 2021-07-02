@@ -59,6 +59,7 @@ func (l *Links) Scan(src interface{}) error {
 	return nil
 }
 
+// TODO: Remove
 // func (l Link) Value() (driver.Value, error) {
 // 	fmt.Println("VALUE", l)
 // 	return driver.Value("{}"), nil
