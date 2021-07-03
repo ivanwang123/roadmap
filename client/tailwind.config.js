@@ -8,6 +8,8 @@ module.exports = {
     extend: {
       colors: {
         ...colors,
+        secondary: "#F5F7FB",
+        tertiary: "#F6F8FA",
       },
       rotate: {
         "-135": "-135deg",

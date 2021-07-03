@@ -47,7 +47,7 @@ function Roadmap() {
       <main className="sidebar-grid h-full max-h-full overflow-hidden bg-white">
         {/* SIDEBAR */}
         <section className="w-64 h-full">
-          <div className="sticky top-0 flex flex-col h-full bg-trueGray-100 pl-10 pt-16 shadow-inner overflow-auto">
+          <div className="sticky top-0 flex flex-col h-full bg-tertiary pl-10 pt-16 shadow-inne overflow-auto">
             <h6 className="text-gray-400 font-bold mb-4">CHECKPOINTS</h6>
             <div className="checkpoints-grid gap-x-1 items-center">
               {data.roadmap.checkpoints.map(
@@ -76,7 +76,9 @@ function Roadmap() {
               </h1>
               <div className="flex text-gray-400 tracking-wide mt-4 mb-3">
                 <div className="flex items-center mr-10">
-                  <User className="fill-current mr-2" width={20} height={20} />
+                  <span className="grid place-items-center bg-secondary p-1">
+                    <User className="fill-current" width={20} height={20} />
+                  </span>
                   <span className="font-semibold mr-1">
                     {data.roadmap.followers.length}
                   </span>{" "}

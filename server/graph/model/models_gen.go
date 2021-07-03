@@ -25,8 +25,9 @@ type GetRoadmap struct {
 }
 
 type GetRoadmaps struct {
-	Cursor string `json:"cursor"`
-	Sort   Sort   `json:"sort"`
+	CursorID    int    `json:"cursorId"`
+	CursorValue string `json:"cursorValue"`
+	Sort        Sort   `json:"sort"`
 }
 
 type GetUser struct {

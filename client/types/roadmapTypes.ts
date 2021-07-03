@@ -11,3 +11,11 @@ export type RoadmapType = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+export enum SortType {
+  NEWEST = "NEWEST",
+  OLDEST = "OLDEST",
+  MOST_FOLLOWERS = "MOST_FOLLOWERS",
+  MOST_CHECKPOINTS = "MOST_CHECKPOINTS",
+  LEAST_CHECKPOINTS = "LEAST_CHECKPOINTS",
+}

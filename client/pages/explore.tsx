@@ -4,11 +4,14 @@ import Layout from "../components/Layout";
 import Loading from "../components/Loading";
 import RoadmapCard from "../components/RoadmapCard";
 import { ROADMAPS_QUERY } from "../graphql/queries/roadmaps";
+import { SortType } from "../types/roadmapTypes";
 
 function Explore() {
   const { data, loading, error } = useQuery(ROADMAPS_QUERY, {
     variables: {
-      sort: "NEWEST",
+      cursorId: 1,
+      cursorValue: "1",
+      sort: SortType.MOST_CHECKPOINTS,
     },
   });
 

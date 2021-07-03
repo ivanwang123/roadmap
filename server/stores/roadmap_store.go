@@ -20,30 +20,44 @@ func (s *RoadmapStore) Create(input *model.NewRoadmap) (*model.Roadmap, error) {
 	return &roadmap, nil
 }
 
-func (s *RoadmapStore) GetByNewest(cursor string) ([]*model.Roadmap, error) {
+func (s *RoadmapStore) GetByNewest(cursorID int, cursorValue string) ([]*model.Roadmap, error) {
 	roadmaps := []*model.Roadmap{}
-	if err := s.Select(&roadmaps, "SELECT * FROM roadmaps WHERE created_at < $1 ORDER BY created_at DESC LIMIT $2", cursor, paginationLimit); err != nil {
+	if err := s.Select(&roadmaps, "SELECT * FROM roadmaps WHERE (created_at, id) <= ($1, $2) ORDER BY created_at DESC, id DESC LIMIT $3", cursorValue, cursorID, paginationLimit); err != nil {
 		return nil, err
 	}
 	return roadmaps, nil
 }
 
-func (s *RoadmapStore) GetByOldest(cursor string) ([]*model.Roadmap, error) {
-	return nil, nil
+func (s *RoadmapStore) GetByOldest(cursorID int, cursorValue string) ([]*model.Roadmap, error) {
+	roadmaps := []*model.Roadmap{}
+	if err := s.Select(&roadmaps, "SELECT * FROM roadmaps WHERE (created_at, id) >= ($1, $2) ORDER BY created_at ASC, id ASC LIMIT $3", cursorValue, cursorID, paginationLimit); err != nil {
+		return nil, err
+	}
+	return roadmaps, nil
 }
 
-func (s *RoadmapStore) GetByMostFollowers(cursor string) ([]*model.Roadmap, error) {
-	// TODO: Figure out how to format cursor for count & id
-	// SELECT * FROM roadmaps LEFT JOIN roadmap_followers rf ON rf.roadmap_id = id GROUP BY id HAVING (count(rf.user_id), id) <= (1, 1) ORDER BY count(rf.user_id) DESC, id DESC LIMIT 30;
-	return nil, nil
+func (s *RoadmapStore) GetByMostFollowers(cursorID int, cursorValue string) ([]*model.Roadmap, error) {
+	roadmaps := []*model.Roadmap{}
+	if err := s.Select(&roadmaps, "SELECT r.* FROM roadmaps r LEFT JOIN roadmap_followers rf ON rf.roadmap_id = r.id GROUP BY r.id HAVING (count(rf.roadmap_id), r.id) <= ($1, $2) ORDER BY count(rf.roadmap_id) DESC, r.id DESC LIMIT $3", cursorValue, cursorID, paginationLimit); err != nil {
+		return nil, err
+	}
+	return roadmaps, nil
 }
 
-func (s *RoadmapStore) GetByMostCheckpoints(cursor string) ([]*model.Roadmap, error) {
-	return nil, nil
+func (s *RoadmapStore) GetByMostCheckpoints(cursorID int, cursorValue string) ([]*model.Roadmap, error) {
+	roadmaps := []*model.Roadmap{}
+	if err := s.Select(&roadmaps, "SELECT r.* FROM roadmaps r LEFT JOIN checkpoints c ON c.roadmap_id = r.id GROUP BY r.id HAVING (count(c.id), r.id) <= ($1, $2) ORDER BY count(c.id) DESC, r.id DESC LIMIT $3", cursorValue, cursorID, paginationLimit); err != nil {
+		return nil, err
+	}
+	return roadmaps, nil
 }
 
-func (s *RoadmapStore) GetByLeastCheckpoints(cursor string) ([]*model.Roadmap, error) {
-	return nil, nil
+func (s *RoadmapStore) GetByLeastCheckpoints(cursorID int, cursorValue string) ([]*model.Roadmap, error) {
+	roadmaps := []*model.Roadmap{}
+	if err := s.Select(&roadmaps, "SELECT r.* FROM roadmaps r LEFT JOIN checkpoints c ON c.roadmap_id = r.id GROUP BY r.id HAVING (count(c.id), r.id) >= ($1, $2) ORDER BY count(c.id) ASC, r.id ASC LIMIT $3", cursorValue, cursorID, paginationLimit); err != nil {
+		return nil, err
+	}
+	return roadmaps, nil
 }
 
 func (s *RoadmapStore) GetAll() ([]*model.Roadmap, error) {

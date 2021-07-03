@@ -27,6 +27,7 @@ input GetRoadmap {
 }
 
 input GetRoadmaps {
-  cursor: String!
+  cursorId: Int!
+  cursorValue: String!
   sort: Sort!
 }

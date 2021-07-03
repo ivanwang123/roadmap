@@ -707,7 +707,8 @@ input GetRoadmap {
 }
 
 input GetRoadmaps {
-  cursor: String!
+  cursorId: Int!
+  cursorValue: String!
   sort: Sort!
 }
 `, BuiltIn: false},
@@ -3954,11 +3955,19 @@ func (ec *executionContext) unmarshalInputGetRoadmaps(ctx context.Context, obj i
 
 	for k, v := range asMap {
 		switch k {
-		case "cursor":
+		case "cursorId":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("cursor"))
-			it.Cursor, err = ec.unmarshalNString2string(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("cursorId"))
+			it.CursorID, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "cursorValue":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("cursorValue"))
+			it.CursorValue, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}

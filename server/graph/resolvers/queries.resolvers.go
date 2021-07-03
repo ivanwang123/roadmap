@@ -28,15 +28,15 @@ func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 func (r *queryResolver) Roadmaps(ctx context.Context, input *model.GetRoadmaps) ([]*model.Roadmap, error) {
 	switch input.Sort {
 	case model.SortNewest:
-		return stores.ForContext(ctx).RoadmapStore.GetByNewest(input.Cursor)
+		return stores.ForContext(ctx).RoadmapStore.GetByNewest(input.CursorID, input.CursorValue)
 	case model.SortOldest:
-		return stores.ForContext(ctx).RoadmapStore.GetByOldest(input.Cursor)
+		return stores.ForContext(ctx).RoadmapStore.GetByOldest(input.CursorID, input.CursorValue)
 	case model.SortMostFollowers:
-		return stores.ForContext(ctx).RoadmapStore.GetByMostFollowers(input.Cursor)
+		return stores.ForContext(ctx).RoadmapStore.GetByMostFollowers(input.CursorID, input.CursorValue)
 	case model.SortMostCheckpoints:
-		return stores.ForContext(ctx).RoadmapStore.GetByMostCheckpoints(input.Cursor)
+		return stores.ForContext(ctx).RoadmapStore.GetByMostCheckpoints(input.CursorID, input.CursorValue)
 	case model.SortLeastCheckpoints:
-		return stores.ForContext(ctx).RoadmapStore.GetByLeastCheckpoints(input.Cursor)
+		return stores.ForContext(ctx).RoadmapStore.GetByLeastCheckpoints(input.CursorID, input.CursorValue)
 	default:
 		return nil, errors.New("Invalid sort option")
 	}
