@@ -9,17 +9,17 @@ import (
 )
 
 type Checkpoint struct {
-	ID           int       `json:"id"`
-	Title        string    `json:"title"`
-	Instructions string    `json:"instructions"`
-	Status       Status    `json:"status"`
-	Links        Links     `json:"links"`
-	RoadmapID    int       `json:"roadmap"`
-	CreatedAt    time.Time `json:"createdAt"`
-	UpdatedAt    time.Time `json:"updatedAt"`
+	ID           int        `json:"id"`
+	Title        string     `json:"title"`
+	Instructions string     `json:"instructions"`
+	Status       StatusType `json:"status"`
+	Links        Links      `json:"links"`
+	RoadmapID    int        `json:"roadmap"`
+	CreatedAt    time.Time  `json:"createdAt"`
+	UpdatedAt    time.Time  `json:"updatedAt"`
 }
 
-type Status string
+type StatusType Status
 
 type Links []*Link
 type Link struct {

@@ -1,12 +1,9 @@
 import { graphql, ChildDataProps } from "@apollo/react-hoc";
+import { UserInfoFieldsFragment } from "../graphql/generated/generated";
 import { ME_QUERY } from "../graphql/queries/me";
 
 type Response = {
-  me: {
-    id: number;
-    username: string;
-    email: string;
-  };
+  me: UserInfoFieldsFragment;
 };
 
 export type AuthChildProps<TInputProps = {}> = ChildDataProps<

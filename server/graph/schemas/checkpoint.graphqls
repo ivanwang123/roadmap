@@ -3,7 +3,7 @@ type Checkpoint {
   title: String!
   instructions: String!
   links: [Link!]!
-  status: String
+  status: Status
   roadmap: Roadmap!
   createdAt: Time!
   updatedAt: Time!
@@ -14,4 +14,10 @@ type Link {
   title: String!
   description: String!
   image: String!
+}
+
+enum Status {
+  COMPLETE
+  INCOMPLETE
+  SKIP
 }

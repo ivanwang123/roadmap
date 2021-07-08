@@ -5,7 +5,7 @@ type Query {
   roadmap(input: GetRoadmap): Roadmap!
   users: [User!]!
   roadmaps(input: GetRoadmaps): [Roadmap!]!
-  me: User @isAuthenticated
+  me: User
 }
 
 enum Sort {

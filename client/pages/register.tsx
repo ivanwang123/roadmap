@@ -57,14 +57,17 @@ function Register() {
       <main className="grid grid-cols-12">
         <section className="col-start-2 col-end-7"></section>
         <section className="max-w-sm col-start-7 col-end-12">
-          <h1 className="text-5xl text-gray-800 font-bold tracking-wider mt-8 mb-3">
+          <h1 className="text-3xl text-gray-800 font-medium tracking-wide mt-8 mb-3">
             Sign up
           </h1>
           {/* <Alert message={message} error={error} /> */}
 
           <form className="flex flex-col" onSubmit={handleSubmit(onSubmit)}>
             <div className="flex flex-col my-8">
-              <label htmlFor="email" className="text-gray-800 font-semibold">
+              <label
+                htmlFor="email"
+                className="text-gray-800 font-medium tracking-wide"
+              >
                 Email
               </label>
               <input
@@ -89,7 +92,10 @@ function Register() {
             </div>
 
             <div className="flex flex-col mb-8">
-              <label htmlFor="username" className="text-gray-800 font-semibold">
+              <label
+                htmlFor="username"
+                className="text-gray-800 font-medium tracking-wide"
+              >
                 Username
               </label>
               <input
@@ -112,7 +118,10 @@ function Register() {
             </div>
 
             <div className="flex flex-col mb-8">
-              <label htmlFor="password" className="text-gray-800 font-semibold">
+              <label
+                htmlFor="password"
+                className="text-gray-800 font-medium tracking-wide"
+              >
                 Password
               </label>
               <input
@@ -132,7 +141,7 @@ function Register() {
 
             <button
               type="submit"
-              className="bg-green-500 text-white font-bold py-2 rounded"
+              className="bg-green-500 text-white font-medium tracking-wide py-2 rounded"
             >
               Sign up
             </button>

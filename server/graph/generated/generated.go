@@ -123,7 +123,7 @@ type ComplexityRoot struct {
 
 type CheckpointResolver interface {
 	Links(ctx context.Context, obj *model.Checkpoint) ([]*model.Link, error)
-	Status(ctx context.Context, obj *model.Checkpoint) (*string, error)
+	Status(ctx context.Context, obj *model.Checkpoint) (*model.Status, error)
 	Roadmap(ctx context.Context, obj *model.Checkpoint) (*model.Roadmap, error)
 }
 type MutationResolver interface {
@@ -132,7 +132,7 @@ type MutationResolver interface {
 	CreateUser(ctx context.Context, input model.NewUser) (*model.User, error)
 	CreateCheckpoint(ctx context.Context, input model.NewCheckpoint) (*model.Checkpoint, error)
 	CreateRoadmap(ctx context.Context, input model.NewRoadmap) (*model.Roadmap, error)
-	ToggleFollowRoadmap(ctx context.Context, input model.FollowRoadmap) (bool, error)
+	ToggleFollowRoadmap(ctx context.Context, input model.FollowRoadmap) (*model.Roadmap, error)
 	UpdateCheckpointStatus(ctx context.Context, input model.UpdateStatus) (*model.Checkpoint, error)
 }
 type QueryResolver interface {
@@ -607,7 +607,7 @@ var sources = []*ast.Source{
   title: String!
   instructions: String!
   links: [Link!]!
-  status: String
+  status: Status
   roadmap: Roadmap!
   createdAt: Time!
   updatedAt: Time!
@@ -619,12 +619,18 @@ type Link {
   description: String!
   image: String!
 }
+
+enum Status {
+  COMPLETE
+  INCOMPLETE
+  SKIP
+}
 `, BuiltIn: false},
 	{Name: "graph/schemas/checkpoint_status.graphqls", Input: `type CheckpointStatus {
   userId: Int!
   checkpointId: Int!
   roadmapId: Int!
-  status: String!
+  status: Status!
 }
 `, BuiltIn: false},
 	{Name: "graph/schemas/mutations.graphqls", Input: `# MUTATIONS
@@ -635,7 +641,7 @@ type Mutation {
   createUser(input: NewUser!): User! @isAuthenticated
   createCheckpoint(input: NewCheckpoint!): Checkpoint! @isAuthenticated
   createRoadmap(input: NewRoadmap!): Roadmap! @isAuthenticated
-  toggleFollowRoadmap(input: FollowRoadmap!): Boolean! @isAuthenticated
+  toggleFollowRoadmap(input: FollowRoadmap!): Roadmap! @isAuthenticated
   updateCheckpointStatus(input: UpdateStatus!): Checkpoint! @isAuthenticated
 }
 
@@ -669,13 +675,12 @@ input NewRoadmap {
 }
 
 input FollowRoadmap {
-  userId: Int!
   roadmapId: Int!
 }
 
 input UpdateStatus {
   checkpointId: Int!
-  status: String!
+  status: Status!
 }
 `, BuiltIn: false},
 	{Name: "graph/schemas/queries.graphqls", Input: `# QUERIES
@@ -685,7 +690,7 @@ type Query {
   roadmap(input: GetRoadmap): Roadmap!
   users: [User!]!
   roadmaps(input: GetRoadmaps): [Roadmap!]!
-  me: User @isAuthenticated
+  me: User
 }
 
 enum Sort {
@@ -1103,9 +1108,9 @@ func (ec *executionContext) _Checkpoint_status(ctx context.Context, field graphq
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(*model.Status)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOStatus2ᚖgithubᚗcomᚋivanwang123ᚋroadmapᚋserverᚋgraphᚋmodelᚐStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Checkpoint_roadmap(ctx context.Context, field graphql.CollectedField, obj *model.Checkpoint) (ret graphql.Marshaler) {
@@ -1348,9 +1353,9 @@ func (ec *executionContext) _CheckpointStatus_status(ctx context.Context, field 
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(model.Status)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNStatus2githubᚗcomᚋivanwang123ᚋroadmapᚋserverᚋgraphᚋmodelᚐStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Link_url(ctx context.Context, field graphql.CollectedField, obj *model.Link) (ret graphql.Marshaler) {
@@ -1818,10 +1823,10 @@ func (ec *executionContext) _Mutation_toggleFollowRoadmap(ctx context.Context, f
 		if tmp == nil {
 			return nil, nil
 		}
-		if data, ok := tmp.(bool); ok {
+		if data, ok := tmp.(*model.Roadmap); ok {
 			return data, nil
 		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/ivanwang123/roadmap/server/graph/model.Roadmap`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1833,9 +1838,9 @@ func (ec *executionContext) _Mutation_toggleFollowRoadmap(ctx context.Context, f
 		}
 		return graphql.Null
 	}
-	res := resTmp.(bool)
+	res := resTmp.(*model.Roadmap)
 	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+	return ec.marshalNRoadmap2ᚖgithubᚗcomᚋivanwang123ᚋroadmapᚋserverᚋgraphᚋmodelᚐRoadmap(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_updateCheckpointStatus(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2078,28 +2083,8 @@ func (ec *executionContext) _Query_me(ctx context.Context, field graphql.Collect
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Me(rctx)
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.IsAuthenticated == nil {
-				return nil, errors.New("directive isAuthenticated is not implemented")
-			}
-			return ec.directives.IsAuthenticated(ctx, nil, directive0)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*model.User); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/ivanwang123/roadmap/server/graph/model.User`, tmp)
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Me(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3907,14 +3892,6 @@ func (ec *executionContext) unmarshalInputFollowRoadmap(ctx context.Context, obj
 
 	for k, v := range asMap {
 		switch k {
-		case "userId":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userId"))
-			it.UserID, err = ec.unmarshalNInt2int(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "roadmapId":
 			var err error
 
@@ -4175,7 +4152,7 @@ func (ec *executionContext) unmarshalInputUpdateStatus(ctx context.Context, obj 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalNString2string(ctx, v)
+			it.Status, err = ec.unmarshalNStatus2githubᚗcomᚋivanwang123ᚋroadmapᚋserverᚋgraphᚋmodelᚐStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -5214,6 +5191,16 @@ func (ec *executionContext) marshalNSort2githubᚗcomᚋivanwang123ᚋroadmapᚋ
 	return v
 }
 
+func (ec *executionContext) unmarshalNStatus2githubᚗcomᚋivanwang123ᚋroadmapᚋserverᚋgraphᚋmodelᚐStatus(ctx context.Context, v interface{}) (model.Status, error) {
+	var res model.Status
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNStatus2githubᚗcomᚋivanwang123ᚋroadmapᚋserverᚋgraphᚋmodelᚐStatus(ctx context.Context, sel ast.SelectionSet, v model.Status) graphql.Marshaler {
+	return v
+}
+
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -5605,6 +5592,22 @@ func (ec *executionContext) unmarshalOGetUser2ᚖgithubᚗcomᚋivanwang123ᚋro
 	}
 	res, err := ec.unmarshalInputGetUser(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOStatus2ᚖgithubᚗcomᚋivanwang123ᚋroadmapᚋserverᚋgraphᚋmodelᚐStatus(ctx context.Context, v interface{}) (*model.Status, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.Status)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOStatus2ᚖgithubᚗcomᚋivanwang123ᚋroadmapᚋserverᚋgraphᚋmodelᚐStatus(ctx context.Context, sel ast.SelectionSet, v *model.Status) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
 }
 
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {

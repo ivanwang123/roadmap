@@ -5,10 +5,23 @@
   -created at DESC (default) ASC
   -followers DESC
   -checkpoints DESC ASC
+- Create user profile page
+- User to user follow
+- Fuzzy search
 - Create index for fields used in order by (https://leopard.in.ua/2014/10/11/postgresql-paginattion#.YN4ynehKjb0)
 - Remove password from return value
 - Implement testing
 - Query complexity
+
+# PAGES
+
+/
+/explore
+/login
+/register
+/map/[id]
+/user/[id]
+/checkpoint/[id]?
 
 # TECHNOLOGIES
 
@@ -22,12 +35,3 @@
 - Gqlgen
 - Dataloader
 - Cypress
-
-# PAGES
-
-/
-/explore
-/login
-/register
-/map/[id]
-/user/[id]

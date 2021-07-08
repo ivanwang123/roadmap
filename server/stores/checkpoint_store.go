@@ -39,7 +39,7 @@ func (s *CheckpointStore) UpdateStatus(userId int, input *model.UpdateStatus) (*
 	if err := s.Get(&checkpoint, "SELECT * FROM checkpoints WHERE id = $1", input.CheckpointID); err != nil {
 		return nil, nil
 	}
-	checkpoint.Status = model.Status(input.Status)
+	checkpoint.Status = model.StatusType(input.Status)
 	fmt.Printf("%+v \n", checkpoint)
 	return &checkpoint, nil
 }

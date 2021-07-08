@@ -56,9 +56,10 @@ func (r *mutationResolver) CreateRoadmap(ctx context.Context, input model.NewRoa
 	return stores.ForContext(ctx).RoadmapStore.Create(&input)
 }
 
-func (r *mutationResolver) ToggleFollowRoadmap(ctx context.Context, input model.FollowRoadmap) (bool, error) {
-	// userId := auth.ForContext(ctx)
-	return stores.ForContext(ctx).RoadmapFollowerStore.ToggleFollowRoadmap(&input)
+func (r *mutationResolver) ToggleFollowRoadmap(ctx context.Context, input model.FollowRoadmap) (*model.Roadmap, error) {
+	userId := auth.ForContext(ctx)
+	store := stores.ForContext(ctx)
+	return store.RoadmapFollowerStore.ToggleFollowRoadmap(store, userId, input.RoadmapID)
 }
 
 func (r *mutationResolver) UpdateCheckpointStatus(ctx context.Context, input model.UpdateStatus) (*model.Checkpoint, error) {

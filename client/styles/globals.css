@@ -49,6 +49,6 @@ h6 {
   transform: rotate(45deg) scaleX(-1);
 }
 
-.mr-xs {
-  margin-right: 0.06rem;
+.scroll-smooth {
+  scroll-behavior: smooth;
 }

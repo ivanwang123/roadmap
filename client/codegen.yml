@@ -1,0 +1,24 @@
+overwrite: true
+schema: "http://localhost:8080/query"
+documents: "graphql/**/*.ts"
+generates:
+  graphql/generated/generated.ts:
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-react-apollo"
+      - "fragment-matcher"
+    config:
+      withHooks: false
+      withMutationFn: false
+      withResultType: false
+      withMutationOptionsType: false
+      addDocBlocks: false
+      skipTypename: true
+      scalars:
+        ID: number
+        Time: Date
+      preResolveTypes: true
+  ./graphql.schema.json:
+    plugins:
+      - "introspection"

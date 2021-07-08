@@ -6,7 +6,7 @@ type Mutation {
   createUser(input: NewUser!): User! @isAuthenticated
   createCheckpoint(input: NewCheckpoint!): Checkpoint! @isAuthenticated
   createRoadmap(input: NewRoadmap!): Roadmap! @isAuthenticated
-  toggleFollowRoadmap(input: FollowRoadmap!): Boolean! @isAuthenticated
+  toggleFollowRoadmap(input: FollowRoadmap!): Roadmap! @isAuthenticated
   updateCheckpointStatus(input: UpdateStatus!): Checkpoint! @isAuthenticated
 }
 
@@ -40,11 +40,10 @@ input NewRoadmap {
 }
 
 input FollowRoadmap {
-  userId: Int!
   roadmapId: Int!
 }
 
 input UpdateStatus {
   checkpointId: Int!
-  status: String!
+  status: Status!
 }

@@ -1,56 +1,52 @@
 import React from "react";
-import CheckCircle from "../svgs/check-circle.svg";
+import { Status } from "../graphql/generated/generated";
+// import CheckCircle from "../svgs/check-circle.svg";
+import Check from "../svgs/check.svg";
 import Circle from "../svgs/circle.svg";
-import SkipCircle from "../svgs/skip-circle.svg";
-import { StatusType } from "../types/checkpointTypes";
+// import SkipCircle from "../svgs/skip-circle.svg";
+import Skip from "../svgs/skip.svg";
 
 type Props = {
-  checkpoint: string;
-  status?: StatusType;
-  isLast?: boolean;
+  id: number;
+  title: string;
+  status?: Status | null;
 };
 
-function CheckpointStatus({ checkpoint, status, isLast = false }: Props) {
+function CheckpointStatus({ id, title, status }: Props) {
   let icon = null;
-  let barColor = "border-gray-200";
 
   switch (status) {
-    case "complete":
+    case Status.Complete:
       icon = (
-        <CheckCircle
-          className="col-start-1 fill-current text-emerald-400 mx-auto z-10"
-          width={24}
-          height={24}
-        />
+        <span className="col-start-1 w-6 h-6 p-1 bg-emerald-100 mx-auto rounded-full z-10">
+          <Check
+            className="fill-current text-emerald-500"
+            width={16}
+            height={16}
+          />
+        </span>
       );
-      barColor = "border-emerald-400";
       break;
-    case "skip":
+    case Status.Skip:
       icon = (
-        <SkipCircle
-          className="col-start-1 fill-current text-yellow-400 mx-auto z-10"
-          width={24}
-          height={24}
-        />
-      );
-      barColor = "border-yellow-400";
-      break;
-    case "current":
-      icon = (
-        <Circle
-          className="col-start-1 fill-current text-gray-700 mx-auto z-10"
-          width={12}
-          height={12}
-        />
+        <span className="col-start-1 w-6 h-6 p-1 bg-yellow-100 mx-auto rounded-full z-10">
+          <Skip
+            className="fill-current text-yellow-500"
+            width={16}
+            height={16}
+          />
+        </span>
       );
       break;
     default:
       icon = (
-        <Circle
-          className="col-start-1 fill-current text-gray-300 mx-auto z-10"
-          width={12}
-          height={12}
-        />
+        <span className="grid place-items-center w-6 h-6 mx-auto">
+          <Circle
+            className="col-start-1 fill-current text-gray-300 mx-auto z-10"
+            width={10}
+            height={10}
+          />
+        </span>
       );
       break;
   }
@@ -58,18 +54,17 @@ function CheckpointStatus({ checkpoint, status, isLast = false }: Props) {
   return (
     <>
       {icon}
-      <p
-        className={`flex items-center text-gray-400 tracking-wide ${
-          status === "current" ? "font-bold" : ""
-        }`}
+      <a
+        href={"#" + title + " " + id}
+        className="flex items-center text-gray-400 text-sm font-light tracking-wide"
       >
-        {checkpoint}
-      </p>
-      {!isLast && (
+        {title}
+      </a>
+      {/* {!isLast && (
         <div
-          className={`w-1/2 h-8 justify-self-end border-l-2 -my-2 mr-xs ${barColor}`}
+          className={`w-px h-10 justify-self-center -my-2 ${barColor}`}
         ></div>
-      )}
+      )} */}
     </>
   );
 }

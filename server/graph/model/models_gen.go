@@ -12,11 +12,10 @@ type CheckpointStatus struct {
 	UserID       int    `json:"userId"`
 	CheckpointID int    `json:"checkpointId"`
 	RoadmapID    int    `json:"roadmapId"`
-	Status       string `json:"status"`
+	Status       Status `json:"status"`
 }
 
 type FollowRoadmap struct {
-	UserID    int `json:"userId"`
 	RoadmapID int `json:"roadmapId"`
 }
 
@@ -61,7 +60,7 @@ type NewUser struct {
 
 type UpdateStatus struct {
 	CheckpointID int    `json:"checkpointId"`
-	Status       string `json:"status"`
+	Status       Status `json:"status"`
 }
 
 type Sort string
@@ -108,5 +107,48 @@ func (e *Sort) UnmarshalGQL(v interface{}) error {
 }
 
 func (e Sort) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type Status string
+
+const (
+	StatusComplete   Status = "COMPLETE"
+	StatusIncomplete Status = "INCOMPLETE"
+	StatusSkip       Status = "SKIP"
+)
+
+var AllStatus = []Status{
+	StatusComplete,
+	StatusIncomplete,
+	StatusSkip,
+}
+
+func (e Status) IsValid() bool {
+	switch e {
+	case StatusComplete, StatusIncomplete, StatusSkip:
+		return true
+	}
+	return false
+}
+
+func (e Status) String() string {
+	return string(e)
+}
+
+func (e *Status) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = Status(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid Status", str)
+	}
+	return nil
+}
+
+func (e Status) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }

@@ -44,6 +44,9 @@ func (r *queryResolver) Roadmaps(ctx context.Context, input *model.GetRoadmaps) 
 
 func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
 	userId := auth.ForContext(ctx)
+	if userId < 0 {
+		return nil, nil
+	}
 	return stores.ForContext(ctx).UserStore.GetById(userId)
 }
 

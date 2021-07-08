@@ -6,7 +6,7 @@ import { LOGOUT_MUTATION } from "../graphql/mutations/logout";
 import withAuth, { AuthChildProps } from "../hoc/withAuth";
 import { getApolloClient } from "../lib/apollo-client";
 
-function Navbar({ data: { loading, error } }: AuthChildProps) {
+function Navbar({ data: { me, loading, error } }: AuthChildProps) {
   const router = useRouter();
 
   const [logout] = useMutation(LOGOUT_MUTATION);
@@ -22,11 +22,12 @@ function Navbar({ data: { loading, error } }: AuthChildProps) {
       .catch((e) => console.error(e));
   };
 
+  console.log(me, error);
   let links = null;
   if (loading) {
     console.log("LOADING");
     links = null;
-  } else if (error) {
+  } else if (!me || error) {
     let query: any = {
       redirect: router.query.redirect || router.asPath,
     };
@@ -36,12 +37,12 @@ function Navbar({ data: { loading, error } }: AuthChildProps) {
     links = (
       <>
         <Link href={{ pathname: "/login", query }}>
-          <a className="text-gray-400 font-semibold tracking-wide transition duration-200 hover:text-gray-800">
+          <a className="text-gray-400 font-medium tracking-wide transition duration-300 hover:text-gray-800">
             Log in
           </a>
         </Link>
         <Link href={{ pathname: "/register", query }}>
-          <a className="text-gray-400 font-semibold tracking-wide transition duration-200 hover:text-gray-800">
+          <a className="text-gray-400 font-medium tracking-wide transition duration-300 hover:text-gray-800">
             Sign up
           </a>
         </Link>
@@ -52,7 +53,7 @@ function Navbar({ data: { loading, error } }: AuthChildProps) {
       <>
         <button
           type="button"
-          className="text-gray-400 font-semibold tracking-wide transition duration-200 hover:text-gray-800 focus:outline-none"
+          className="text-gray-400 font-medium tracking-wide transition duration-300 hover:text-gray-800 focus:outline-none"
           onClick={handleLogout}
         >
           Logout
@@ -62,7 +63,7 @@ function Navbar({ data: { loading, error } }: AuthChildProps) {
   }
 
   return (
-    <nav className="flex items-center w-full h-full border-b-2 pl-10">
+    <nav className="flex items-center w-full h-full border-b-2 border-secondary pl-10">
       <Link href="/">
         <a className="text-2xl text-gray-800 font-bold">ROADMAP</a>
       </Link>

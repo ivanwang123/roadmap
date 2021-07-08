@@ -25,10 +25,11 @@ function createApolloClient() {
         Query: {
           fields: {
             roadmaps: {
-              keyArgs: ["type", "sort"],
-              merge(existing, incoming, { args: { cursor } }: any) {
-                const merged = existing ? existing.slice(0) : [];
-                let offset = offsetFromCursor(merged, cursor);
+              keyArgs: ["type", "input", ["sort"]],
+              merge(existing = [], incoming, { args: { input } }: any) {
+                const merged = existing.slice(0);
+
+                let offset = offsetFromCursor(merged, input.cursorId);
 
                 for (let i = 0; i < incoming.length; i++) {
                   merged[offset + i] = incoming[i];
