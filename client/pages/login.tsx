@@ -1,18 +1,18 @@
-import React, { useState } from "react";
-import Router, { useRouter } from "next/router";
-import Alert from "../components/Alert";
 import { useMutation } from "@apollo/client";
-import { useForm } from "react-hook-form";
-import { ME_QUERY } from "../graphql/queries/me";
-import { LOGIN_MUTATION } from "../graphql/mutations/login";
 import Link from "next/link";
+import Router, { useRouter } from "next/router";
+import React from "react";
+import { useForm } from "react-hook-form";
+import { Input } from "../components/Input";
 import Layout from "../components/Layout";
+import { LOGIN_MUTATION } from "../graphql/mutations/login";
+import { ME_QUERY } from "../graphql/queries/me";
 import { getApolloClient } from "../lib/apollo-client";
 import Loader from "../svgs/loader.svg";
 
 function Login() {
-  const [error, setError] = useState<boolean>(false);
-  const [message, setMessage] = useState<string>("");
+  // const [error, setError] = useState<boolean>(false);
+  // const [message, setMessage] = useState<string>("");
 
   const {
     register,
@@ -27,11 +27,11 @@ function Login() {
     login({
       variables: data,
       update: (cache, { data }) => {
+        console.log("LOGIN DATA", data);
         if (!data || !data.login) {
           return;
         }
 
-        console.log("LOGIN DATA", data);
         cache.writeQuery({
           query: ME_QUERY,
           data: {
@@ -41,6 +41,7 @@ function Login() {
       },
     })
       .then(() => {
+        console.log("LOGIN SUCCESS");
         const client = getApolloClient();
         client.resetStore();
         if (Router.query.redirect !== undefined) {
@@ -50,8 +51,9 @@ function Login() {
         }
       })
       .catch((err) => {
-        setError(true);
-        setMessage(err.message);
+        console.error(err);
+        // setError(true);
+        // setMessage(err.message);
       });
   };
 
@@ -68,55 +70,30 @@ function Login() {
           {/* <Alert message={"message"} error={error} /> */}
 
           <form className="flex flex-col" onSubmit={handleSubmit(onSubmit)}>
-            <div className="flex flex-col my-8">
-              <label
-                htmlFor="email"
-                className="text-gray-800 font-medium tracking-wide"
-              >
-                Email
-              </label>
-              <input
-                type="text"
-                id="email"
-                className={`border-b-2 pt-1 focus:border-gray-800 focus:outline-none ${
-                  errors.email && "border-red-500"
-                }`}
-                {...register("email", {
-                  required: { value: true, message: "Email is required" },
-                  pattern: {
-                    value: new RegExp(
-                      "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$"
-                    ),
-                    message: "Must be a valid email",
-                  },
-                })}
-              />
-              <span className="h-6 text-red-500 mt-1">
-                {errors.email?.message}
-              </span>
-            </div>
+            <Input
+              id="email"
+              name="Email"
+              error={errors.email}
+              register={register("email", {
+                required: { value: true, message: "Email is required" },
+                pattern: {
+                  value: new RegExp(
+                    "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$"
+                  ),
+                  message: "Must be a valid email",
+                },
+              })}
+            />
 
-            <div className="flex flex-col mb-8">
-              <label
-                htmlFor="password"
-                className="text-gray-800 font-medium tracking-wide"
-              >
-                Password
-              </label>
-              <input
-                type="password"
-                id="password"
-                className={`border-b-2 pt-1 focus:border-gray-800 focus:outline-none ${
-                  errors.email && "border-red-500"
-                }`}
-                {...register("password", {
-                  required: { value: true, message: "Password is required" },
-                })}
-              />
-              <span className="h-6 text-red-500 mt-1">
-                {errors.password?.message}
-              </span>
-            </div>
+            <Input
+              id="password"
+              name="Password"
+              type="password"
+              error={errors.password}
+              register={register("password", {
+                required: { value: true, message: "Password is required" },
+              })}
+            />
 
             <button
               type="submit"
@@ -135,6 +112,7 @@ function Login() {
               <span>Log in</span>
             </button>
           </form>
+
           <div className="text-sm text-gray-500 text-center mt-6">
             Don't have an account? <RedirectToSignup />
           </div>

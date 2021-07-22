@@ -13,12 +13,21 @@
 - Implement testing
 - Query complexity
 
+# EXTRA
+
+- Add docker
+- Add docker hot reload
+- Add testing
+- Add continous integration
+- Split into microservices
+
 # PAGES
 
 /
 /explore
 /login
 /register
+/create/map
 /map/[id]
 /user/[id]
 /checkpoint/[id]?
@@ -31,6 +40,7 @@
 - Tailwindcss
 - Apollo
 - GraphQL
+- GraphQL Code Generator
 - Go
 - Gqlgen
 - Dataloader

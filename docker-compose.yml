@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  web:
+    build: ./client
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./client:/next/app
+      - /next/app/node_modules
+      - /next/app/.next
+    depends_on:
+      - server
+    restart: always
+
+  server:
+    build: ./server
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./server:/go/app
+    depends_on:
+      - db
+    restart: always
+
+  db:
+    build: ./server/database
+    ports:
+      - "5432:5432"
+    volumes:
+      - roadmap-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: roadmap
+    restart: always
+
+volumes:
+  roadmap-data:

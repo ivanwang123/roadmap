@@ -30,13 +30,36 @@ function UserProfile() {
   return (
     <Layout title="User | Roadmap">
       <main className="sidebar-grid h-full max-h-full overflow-hidden bg-white">
-        <section className="sticky top-0 flex flex-col h-full border-r-2 border-secondary pl-10 pt-10 overflow-auto">
+        <section className="sticky top-0 flex flex-col h-full border-r-2 border-secondary px-10 pt-10 overflow-auto">
           <div className="w-40 h-40 bg-blue-100 rounded-full"></div>
-          <div>{data!.user.username}</div>
-          <div>Created {data!.user.createdRoadmaps.length} roadmaps</div>
-          <div>Following {data!.user.followingRoadmaps.length} roadmaps</div>
+          <div className="text-2xl text-gray-800 font-medium mt-4">
+            {data!.user.username}
+          </div>
+          <div className="flex text-gray-400 text-sm font-light tracking-wide mt-4">
+            <p className="mr-1">
+              <span className="font-medium">
+                {data!.user.createdRoadmaps.length}
+              </span>{" "}
+              created
+            </p>
+            ·
+            <p className="ml-1">
+              <span className="font-medium">
+                {data!.user.followingRoadmaps.length}
+              </span>{" "}
+              following
+            </p>
+          </div>
         </section>
-        <section className="px-10 overflow-auto scroll-smooth">
+        <section className="px-10 pt-14 overflow-auto scroll-smooth">
+          <div className="flex text-gray-400 text-sm font-light tracking-wide">
+            <p className="mr-8 hover:text-gray-800">
+              Created ({data!.user.createdRoadmaps.length})
+            </p>
+            <p className="hover:text-gray-800">
+              Following ({data!.user.followingRoadmaps.length})
+            </p>
+          </div>
           <div className="max-w-4xl">
             {data!.user.createdRoadmaps.map((roadmap, idx) => (
               <RoadmapCard roadmap={roadmap} key={idx} />

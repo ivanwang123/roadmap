@@ -18,11 +18,7 @@ import { ROADMAP_QUERY } from "../../graphql/queries/roadmapById";
 import withAuth, { AuthChildProps } from "../../hoc/withAuth";
 import { addApolloState, getApolloClient } from "../../lib/apollo-client";
 import Book from "../../svgs/book.svg";
-import Check from "../../svgs/check.svg";
-import Close from "../../svgs/close.svg";
-import DashedArrow from "../../svgs/dashed-arrow.svg";
 import Flag from "../../svgs/flag-big.svg";
-import Skip from "../../svgs/skip.svg";
 
 // function createObserver(el: Element | null) {
 //   if (el) {
@@ -55,7 +51,7 @@ function Roadmap({ data: { me } }: AuthChildProps) {
 
   return (
     <Layout title="Map | Roadmap">
-      <main className="sidebar-grid h-full max-h-full overflow-hidden bg-white">
+      <main className="sidebar-grid h-full max-h-full overflow-hidden">
         {/* SIDEBAR */}
         <section className="w-64 h-full">
           <div className="sticky top-0 flex flex-col h-full border-r-2 border-secondary pl-10 pt-10 overflow-auto">
@@ -142,7 +138,6 @@ function Roadmap({ data: { me } }: AuthChildProps) {
 
             {/* CONTENT */}
             <div className="mb-32">
-              {/* <Checkpoint reference={(el) => createObserver(el)} /> */}
               {data!.roadmap.checkpoints.map((checkpoint, idx) => (
                 <Checkpoint
                   idx={idx + 1}
@@ -151,112 +146,6 @@ function Roadmap({ data: { me } }: AuthChildProps) {
                   key={idx}
                 />
               ))}
-
-              <div className="flex flex-col">
-                <div className="flex items-center mb-3">
-                  <div className="grid place-items-center w-10 h-10 bg-gray-400 text-white font-bold rounded-xl">
-                    2
-                  </div>
-                  <h3 className="text-2xl text-gray-400 font-bold tracking-wide ml-4">
-                    CSS
-                  </h3>
-                </div>
-                <div className="flex flex-col">
-                  <article className="w-full bg-white px-6 -ml-6 pt-4 pb-12 rounded ">
-                    <p className="text-gray-500 tracking-wide leading-7">
-                      HTML is the backbone of a website. These resources go over
-                      the basics and when you finish reading through the
-                      tutorials, take the quiz on w3schools before moving on.
-                    </p>
-                    <h6 className="text-gray-400 font-bold mt-4">RESOURCES</h6>
-                    <div className="flex flex-wrap mt-2">
-                      <div className="text-gray-500 border p-3 rounded">
-                        <span>w3schools.com</span>
-                      </div>
-                    </div>
-                  </article>
-                  <div className="grid grid-flow-col gap-4 place-items-center bg-white px-6 py-4 ml-auto -mt-9 mr-12 rounded-full border-2">
-                    <Check
-                      className="fill-current text-green-500 rounded-full cursor-pointer hover:bg-green-100"
-                      width={40}
-                      height={40}
-                    />
-                    <Close
-                      className="fill-current text-red-500 p-1 rounded-full cursor-pointer hover:bg-red-100"
-                      width={40}
-                      height={40}
-                    />
-                    <Skip
-                      className="fill-current stroke-current text-yellow-500 p-1 rounded-full cursor-pointer hover:bg-yellow-100"
-                      width={40}
-                      height={40}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <DashedArrow
-                  className="fill-current text-gray-400 transform ml-auto"
-                  width={150}
-                  height={150}
-                />
-              </div>
-
-              <div className="flex flex-col">
-                <div className="flex items-center mb-3">
-                  <div className="grid place-items-center w-10 h-10 bg-gray-300 text-white font-bold rounded-xl">
-                    2
-                  </div>
-                  <h3 className="text-2xl text-gray-800 ml-3">CSS</h3>
-                </div>
-                <article className="w-full bg-white px-6 py-4 rounded shadow">
-                  <p className="text-gray-500 tracking-wide leading-7">
-                    CSS is the style of the wyle. Use it to spice up your
-                    website and add some color to your life. Look through the
-                    following links to get a better understanding of it.
-                  </p>
-                  <div className="flex flex-wrap mt-3">
-                    <div className="text-gray-500 border p-3 rounded">
-                      <span>w3schools.com</span>
-                    </div>
-                  </div>
-                </article>
-              </div>
-
-              <div className="">
-                <DashedArrow
-                  className="fill-current text-gray-400 transform ml-auto"
-                  width={150}
-                  height={150}
-                />
-                {/* <ArrowTwo
-                  className="transform rotate-135"
-                  width={100}
-                  height={100}
-                /> */}
-              </div>
-
-              <div className="flex flex-col">
-                <div className="flex items-center mb-3">
-                  <div className="grid place-items-center w-10 h-10 bg-gray-300 text-white font-bold rounded-xl">
-                    3
-                  </div>
-                  <h3 className="text-2xl text-gray-800 ml-3">Javascript</h3>
-                </div>
-                <article className="w-full bg-white px-6 py-4 rounded shadow">
-                  <p className="text-gray-500 tracking-wide leading-7">
-                    CSS is the style of the wyle. Use it to spice up your
-                    website and add some color to your life. Look through the
-                    following links to get a better understanding of it.
-                  </p>
-                  <div className="flex flex-wrap mt-3">
-                    <div className="text-gray-500 border p-3 rounded">
-                      <span>w3schools.com</span>
-                    </div>
-                  </div>
-                </article>
-              </div>
             </div>
           </div>
         </section>

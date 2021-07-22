@@ -1,9 +1,8 @@
 import { useMutation } from "@apollo/client";
 import Link from "next/link";
 import Router, { useRouter } from "next/router";
-import React, { useState } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
-import Alert from "../components/Alert";
 import Layout from "../components/Layout";
 import { REGISTER_MUTATION } from "../graphql/mutations/register";
 import { ME_QUERY } from "../graphql/queries/me";
@@ -11,8 +10,8 @@ import { getApolloClient } from "../lib/apollo-client";
 
 function Register() {
   const [signup] = useMutation(REGISTER_MUTATION);
-  const [error, setError] = useState<boolean>(false);
-  const [message, setMessage] = useState<string>("");
+  // const [error, setError] = useState<boolean>(false);
+  // const [message, setMessage] = useState<string>("");
 
   const {
     register,
@@ -46,9 +45,9 @@ function Register() {
           Router.push("/");
         }
       })
-      .catch((err) => {
-        setError(true);
-        setMessage(err.message);
+      .catch((_err) => {
+        // setError(true);
+        // setMessage(err.message);
       });
   };
 

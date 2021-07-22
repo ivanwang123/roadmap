@@ -3,13 +3,20 @@ import React, { useState } from "react";
 import Layout from "../components/Layout";
 import Loading from "../components/Loading";
 import RoadmapCard from "../components/RoadmapCard";
+import {
+  RoadmapsQuery,
+  RoadmapsQueryVariables,
+  Sort,
+} from "../graphql/generated/generated";
 import { ROADMAPS_QUERY } from "../graphql/queries/roadmaps";
-import { SortType } from "../types/roadmapTypes";
 
 function Explore() {
-  const [sort, setSort] = useState<SortType>(SortType.MOST_FOLLOWERS);
+  const [sort, setSort] = useState<Sort>(Sort.MostFollowers);
 
-  const { data, loading, error } = useQuery(ROADMAPS_QUERY, {
+  const { data, loading, error } = useQuery<
+    RoadmapsQuery,
+    RoadmapsQueryVariables
+  >(ROADMAPS_QUERY, {
     variables: {
       cursorId: 1,
       cursorValue: "1",
@@ -23,7 +30,7 @@ function Explore() {
 
   // TODO: Pagination
   return (
-    <Layout title="Roadmap">
+    <Layout title="Explore | Roadmap">
       <main className="grid grid-cols-12">
         <section className="col-start-4 col-end-11">
           <h1 className="text-3xl text-gray-800 font-medium mt-14 mb-6">
@@ -32,29 +39,25 @@ function Explore() {
           <div className="flex text-gray-400 text-sm font-light tracking-wide">
             <div
               className={`w-16 text-center mr-4 cursor-pointer hover:text-gray-800 ${
-                sort === SortType.MOST_FOLLOWERS
-                  ? "text-gray-800 font-medium"
-                  : ""
+                sort === Sort.MostFollowers ? "text-gray-800 font-medium" : ""
               }`}
-              onClick={() => setSort(SortType.MOST_FOLLOWERS)}
+              onClick={() => setSort(Sort.MostFollowers)}
             >
               Popular
             </div>
             <div
               className={`w-16 text-center mr-4 cursor-pointer hover:text-gray-800 ${
-                sort === SortType.NEWEST ? "text-gray-800 font-medium" : ""
+                sort === Sort.Newest ? "text-gray-800 font-medium" : ""
               }`}
-              onClick={() => setSort(SortType.NEWEST)}
+              onClick={() => setSort(Sort.Newest)}
             >
               New
             </div>
             <div
               className={`w-28 text-center mr-4 cursor-pointer hover:text-gray-800 ${
-                sort === SortType.MOST_CHECKPOINTS
-                  ? "text-gray-800 font-medium"
-                  : ""
+                sort === Sort.MostCheckpoints ? "text-gray-800 font-medium" : ""
               }`}
-              onClick={() => setSort(SortType.MOST_CHECKPOINTS)}
+              onClick={() => setSort(Sort.MostCheckpoints)}
             >
               ^ Checkpoints
             </div>
@@ -62,8 +65,8 @@ function Explore() {
               ^ Resources
             </div>
           </div>
-          {data.roadmaps.map(() => (
-            <RoadmapCard />
+          {data?.roadmaps.map((roadmap) => (
+            <RoadmapCard roadmap={roadmap} />
           ))}
         </section>
       </main>

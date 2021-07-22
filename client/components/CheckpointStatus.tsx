@@ -42,9 +42,9 @@ function CheckpointStatus({ id, title, status }: Props) {
       icon = (
         <span className="grid place-items-center w-6 h-6 mx-auto">
           <Circle
-            className="col-start-1 fill-current text-gray-300 mx-auto z-10"
-            width={10}
-            height={10}
+            className="col-start-1 fill-current text-gray-200 mx-auto z-10"
+            width={8}
+            height={8}
           />
         </span>
       );
@@ -56,7 +56,7 @@ function CheckpointStatus({ id, title, status }: Props) {
       {icon}
       <a
         href={"#" + title + " " + id}
-        className="flex items-center text-gray-400 text-sm font-light tracking-wide"
+        className="flex items-center w-max text-gray-400 text-sm font-light tracking-wide"
       >
         {title}
       </a>
