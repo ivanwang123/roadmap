@@ -1,0 +1,47 @@
+- id: 1
+  title: "Checkpoint 1-1"
+  instructions: "Instructions"
+  links: "{}"
+  roadmap_id: 1
+
+- id: 2
+  title: "Checkpoint 1-2"
+  instructions: "Instructions"
+  links: "{}"
+  roadmap_id: 1
+
+- id: 3
+  title: "Checkpoint 2-1"
+  instructions: "Instructions"
+  links: "{}"
+  roadmap_id: 2
+
+- id: 4
+  title: "Checkpoint 2-2"
+  instructions: "Instructions"
+  links: "{}"
+  roadmap_id: 2
+
+- id: 5
+  title: "Checkpoint 3-1"
+  instructions: "Instructions"
+  links: "{}"
+  roadmap_id: 3
+
+- id: 6
+  title: "Checkpoint 3-2"
+  instructions: "Instructions"
+  links: "{}"
+  roadmap_id: 3
+
+- id: 7
+  title: "Checkpoint 4-1"
+  instructions: "Instructions"
+  links: "{}"
+  roadmap_id: 4
+
+- id: 8
+  title: "Checkpoint 4-2"
+  instructions: "Instructions"
+  links: "{}"
+  roadmap_id: 4

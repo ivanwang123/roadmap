@@ -64,7 +64,7 @@ func (r *mutationResolver) ToggleFollowRoadmap(ctx context.Context, input model.
 
 func (r *mutationResolver) UpdateCheckpointStatus(ctx context.Context, input model.UpdateStatus) (*model.Checkpoint, error) {
 	userId := auth.ForContext(ctx)
-	return stores.ForContext(ctx).UpdateStatus(userId, &input)
+	return stores.ForContext(ctx).CheckpointStore.UpdateStatus(userId, &input)
 }
 
 // Mutation returns generated.MutationResolver implementation.

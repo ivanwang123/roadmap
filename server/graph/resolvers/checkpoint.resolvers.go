@@ -18,7 +18,7 @@ func (r *checkpointResolver) Links(ctx context.Context, obj *model.Checkpoint) (
 func (r *checkpointResolver) Status(ctx context.Context, obj *model.Checkpoint) (*model.Status, error) {
 	checkpointStatus, err := loaders.ForContext(ctx).CheckpointStatus(obj.ID)
 	if err != nil {
-		return nil, err
+		return nil, nil
 	}
 	if checkpointStatus == nil {
 		return nil, nil

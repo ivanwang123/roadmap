@@ -1,44 +1,53 @@
 package stores
 
 import (
-	"fmt"
-
 	"github.com/ivanwang123/roadmap/server/graph/model"
 	"github.com/jmoiron/sqlx"
 )
 
 type RoadmapFollowerStore struct {
-	*sqlx.DB
+	DB *sqlx.DB
 }
 
-// TODO: Get user id from auth context
+func (s *RoadmapFollowerStore) Get(userId, roadmapId int) (*model.RoadmapFollower, error) {
+	var roadmapFollower model.RoadmapFollower
+	if err := s.DB.Get(&roadmapFollower, "SELECT * FROM roadmap_followers WHERE user_id = $1 AND roadmap_id = $2 LIMIT 1", userId, roadmapId); err != nil {
+		return nil, err
+	}
+	return &roadmapFollower, nil
+}
+
+// TODO: Put in transaction?
 func (s *RoadmapFollowerStore) ToggleFollowRoadmap(store *Store, userId, roadmapId int) (*model.Roadmap, error) {
-	if _, err := s.Exec("INSERT INTO roadmap_followers (user_id, roadmap_id) VALUES ($1, $2)", userId, roadmapId); err != nil {
-		if _, err := s.Exec("DELETE FROM roadmap_followers WHERE user_id = $1 AND roadmap_id = $2", userId, roadmapId); err != nil {
+	if _, err := s.DB.Exec("INSERT INTO roadmap_followers (user_id, roadmap_id) VALUES ($1, $2)", userId, roadmapId); err != nil {
+		if _, err := s.DB.Exec("DELETE FROM roadmap_followers WHERE user_id = $1 AND roadmap_id = $2", userId, roadmapId); err != nil {
 			return nil, err
 		}
 
-		// TODO: Delete checkpoint statuses?
-		fmt.Println("UNFOLLOW")
+		checkpoints := make([]int64, 0)
+		err := s.DB.Select(&checkpoints, "SELECT id FROM checkpoints WHERE roadmap_id = $1", roadmapId)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, checkpointId := range checkpoints {
+			// TODO: Batch request
+			s.DB.Exec("DELETE FROM checkpoint_status WHERE user_id = $1 AND checkpoint_id = $2 AND roadmap_id = $3", userId, checkpointId, roadmapId)
+		}
+
 		return store.RoadmapStore.GetById(roadmapId)
 	}
 
-	// TODO: Get roadmap and add checkpoint status to all checkpoints
 	checkpoints := make([]int64, 0)
-	err := s.Select(&checkpoints, "SELECT id FROM checkpoints WHERE roadmap_id = $1", roadmapId)
-	fmt.Println("CHECKPOINTS", checkpoints, err)
+	err := s.DB.Select(&checkpoints, "SELECT id FROM checkpoints WHERE roadmap_id = $1", roadmapId)
 	if err != nil {
 		return nil, err
 	}
 
 	for _, checkpointId := range checkpoints {
-		// TODO: Batch request in transaction
-		s.Exec("INSERT INTO checkpoint_status (user_id, checkpoint_id, roadmap_id) VALUES ($1, $2, $3)", userId, checkpointId, roadmapId)
-		// if err != nil {
-		// 	return nil, err
-		// }
+		// TODO: Batch request
+		s.DB.Exec("INSERT INTO checkpoint_status (user_id, checkpoint_id, roadmap_id) VALUES ($1, $2, $3)", userId, checkpointId, roadmapId)
 	}
 
-	fmt.Println("FOLLOW")
 	return store.RoadmapStore.GetById(roadmapId)
 }

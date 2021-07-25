@@ -32,7 +32,6 @@ type Link struct {
 func (l *Links) Scan(src interface{}) error {
 	linkStr := fmt.Sprintf("%v", src)
 	linkArr := strings.Split(linkStr[1:len(linkStr)-1], ",")
-	fmt.Println("SCAN", linkArr)
 	links := make([]*Link, len(linkArr))
 
 	for i, link := range linkArr {

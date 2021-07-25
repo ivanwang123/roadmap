@@ -2,7 +2,6 @@ package loaders
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 
 	"github.com/graph-gophers/dataloader"
@@ -33,7 +32,6 @@ func checkpointStatusBatchFn(ctx context.Context, keys dataloader.Keys) []*datal
 
 	db := database.ForContext(ctx)
 	userId := auth.ForContext(ctx)
-	fmt.Println("USER ID", userId)
 	if userId < 0 {
 		return handleNilData(results)
 	}

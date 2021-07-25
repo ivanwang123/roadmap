@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"database/sql"
 	"net/http"
 	"regexp"
 	"strings"
@@ -27,6 +28,14 @@ func ConnectDB(dbString string) (*sqlx.DB, error) {
 	})
 
 	return db, nil
+}
+
+func ConvertSqlDB(db *sql.DB) *sqlx.DB {
+	newDB := sqlx.NewDb(db, "pgx")
+	newDB.MapperFunc(func(s string) string {
+		return toSnakeCase(s)
+	})
+	return newDB
 }
 
 func toSnakeCase(str string) string {

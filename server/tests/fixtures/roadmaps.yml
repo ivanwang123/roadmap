@@ -1,0 +1,19 @@
+- id: 1
+  title: "Roadmap One"
+  description: "This is the first roadmap."
+  creator_id: 1
+
+- id: 2
+  title: "Roadmap Two"
+  description: "This is the second roadmap."
+  creator_id: 1
+
+- id: 3
+  title: "Roadmap Three"
+  description: "This is the third roadmap."
+  creator_id: 2
+
+- id: 4
+  title: "Roadmap Four"
+  description: "This is the fourth roadmap."
+  creator_id: 2
