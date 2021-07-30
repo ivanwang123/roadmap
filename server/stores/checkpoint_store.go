@@ -9,13 +9,29 @@ type CheckpointStore struct {
 	DB *sqlx.DB
 }
 
+// TODO: Put in transaction?
 func (s *CheckpointStore) Create(input *model.NewCheckpoint) (*model.Checkpoint, error) {
-	// TODO: Get roadmap followers and add checkpoint status
 	var checkpoint model.Checkpoint
 	if err := s.DB.Get(&checkpoint, "INSERT INTO checkpoints (title, instructions, links, roadmap_id) VALUES ($1, $2, $3, $4) RETURNING *",
 		input.Title, input.Instructions, input.Links, input.RoadmapID); err != nil {
 		return nil, err
 	}
+
+	roadmapFollowers := []*model.RoadmapFollower{}
+	if err := s.DB.Select(&roadmapFollowers, "SELECT * FROM roadmap_followers WHERE roadmap_id = $1", input.RoadmapID); err != nil {
+		return nil, err
+	}
+
+	newCheckpointStatuses := make([]*NewCheckpointStatus, len(roadmapFollowers))
+	for i, follower := range roadmapFollowers {
+		newCheckpointStatuses[i] = &NewCheckpointStatus{userId: follower.UserID, checkpointId: checkpoint.ID, roadmapId: input.RoadmapID}
+	}
+
+	checkpointStatusStore := &CheckpointStatusStore{DB: s.DB}
+	if err := checkpointStatusStore.CreateManyCheckpointStatus(newCheckpointStatuses); err != nil {
+		return nil, err
+	}
+
 	return &checkpoint, nil
 }
 

@@ -14,7 +14,7 @@ func TestCreateCheckpoint(t *testing.T) {
 	roadmapId := 1
 	checkpointId := -1
 
-	_, err := TestStore.RoadmapFollowerStore.ToggleFollowRoadmap(TestStore, userId, roadmapId)
+	_, err := TestStore.RoadmapFollowerStore.ToggleFollowRoadmap(userId, &model.FollowRoadmap{RoadmapID: roadmapId})
 	assert.Nilf(t, err, "Follow roadmap")
 
 	checkpoint, err := TestStore.CheckpointStore.Create(&model.NewCheckpoint{Title: "New checkpoint", Instructions: "Instructions", Links: []string{}, RoadmapID: roadmapId})

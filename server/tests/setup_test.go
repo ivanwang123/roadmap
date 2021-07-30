@@ -44,11 +44,15 @@ func TestMain(m *testing.M) {
 	checkpointStore := &stores.CheckpointStore{
 		DB: sqlxDB,
 	}
+	checkpointStatusStore := &stores.CheckpointStatusStore{
+		DB: sqlxDB,
+	}
 	TestStore = &stores.Store{
-		UserStore:            userStore,
-		RoadmapStore:         roadmapStore,
-		RoadmapFollowerStore: roadmapFollowerStore,
-		CheckpointStore:      checkpointStore,
+		UserStore:             userStore,
+		RoadmapStore:          roadmapStore,
+		RoadmapFollowerStore:  roadmapFollowerStore,
+		CheckpointStore:       checkpointStore,
+		CheckpointStatusStore: checkpointStatusStore,
 	}
 
 	os.Exit(m.Run())

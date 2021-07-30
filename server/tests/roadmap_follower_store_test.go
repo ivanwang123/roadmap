@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"testing"
 
+	"github.com/ivanwang123/roadmap/server/graph/model"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/stretchr/testify/assert"
 )
@@ -16,7 +17,7 @@ func TestToggleFollowRoadmap(t *testing.T) {
 	roadmapId := 1
 
 	t.Run("Follow roadmap", func(t *testing.T) {
-		_, err = TestStore.RoadmapFollowerStore.ToggleFollowRoadmap(TestStore, userId, roadmapId)
+		_, err = TestStore.RoadmapFollowerStore.ToggleFollowRoadmap(userId, &model.FollowRoadmap{RoadmapID: roadmapId})
 		assert.Nilf(t, err, "Follow roadmap")
 
 		roadmapFollower, err := TestStore.RoadmapFollowerStore.Get(userId, roadmapId)
@@ -30,7 +31,7 @@ func TestToggleFollowRoadmap(t *testing.T) {
 	})
 
 	t.Run("Unfollow roadmap", func(t *testing.T) {
-		_, err := TestStore.RoadmapFollowerStore.ToggleFollowRoadmap(TestStore, userId, roadmapId)
+		_, err := TestStore.RoadmapFollowerStore.ToggleFollowRoadmap(userId, &model.FollowRoadmap{RoadmapID: roadmapId})
 		assert.Nilf(t, err, "Unfollow roadmap")
 
 		_, err = TestStore.RoadmapFollowerStore.Get(userId, roadmapId)

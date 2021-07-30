@@ -10,18 +10,20 @@ import (
 const storeCtxKey = "store"
 
 type Store struct {
-	UserStore            *UserStore
-	CheckpointStore      *CheckpointStore
-	RoadmapStore         *RoadmapStore
-	RoadmapFollowerStore *RoadmapFollowerStore
+	UserStore             *UserStore
+	CheckpointStore       *CheckpointStore
+	CheckpointStatusStore *CheckpointStatusStore
+	RoadmapStore          *RoadmapStore
+	RoadmapFollowerStore  *RoadmapFollowerStore
 }
 
 func NewStore(db *sqlx.DB) *Store {
 	return &Store{
-		UserStore:            &UserStore{DB: db},
-		CheckpointStore:      &CheckpointStore{DB: db},
-		RoadmapStore:         &RoadmapStore{DB: db},
-		RoadmapFollowerStore: &RoadmapFollowerStore{DB: db},
+		UserStore:             &UserStore{DB: db},
+		CheckpointStore:       &CheckpointStore{DB: db},
+		CheckpointStatusStore: &CheckpointStatusStore{DB: db},
+		RoadmapStore:          &RoadmapStore{DB: db},
+		RoadmapFollowerStore:  &RoadmapFollowerStore{DB: db},
 	}
 }
 
