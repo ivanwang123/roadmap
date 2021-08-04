@@ -11,12 +11,13 @@ import (
 	"github.com/ivanwang123/roadmap/graphql/generated"
 	"github.com/ivanwang123/roadmap/internal/common/auth"
 	"github.com/ivanwang123/roadmap/internal/common/cookie"
-	"github.com/ivanwang123/roadmap/internal/stores"
 	"github.com/ivanwang123/roadmap/models"
 )
 
+// TODO: Replace store
 func (r *mutationResolver) Login(ctx context.Context, input models.Login) (*models.User, error) {
-	user, err := stores.ForContext(ctx).UserStore.Authenticate(&input)
+	user, err := r.UserUsecase.Authenticate(ctx, &input)
+	// user, err := stores.ForContext(ctx).UserStore.Authenticate(&input)
 	if err != nil {
 		return nil, err
 	}
@@ -45,25 +46,30 @@ func (r *mutationResolver) Logout(ctx context.Context) (bool, error) {
 }
 
 func (r *mutationResolver) CreateUser(ctx context.Context, input models.NewUser) (*models.User, error) {
-	return stores.ForContext(ctx).UserStore.Create(&input)
+	return r.UserUsecase.Create(ctx, &input)
+	// return stores.ForContext(ctx).UserStore.Create(&input)
 }
 
 func (r *mutationResolver) CreateCheckpoint(ctx context.Context, input models.NewCheckpoint) (*models.Checkpoint, error) {
-	return stores.ForContext(ctx).CheckpointStore.Create(&input)
+	return r.CheckpointUsecase.Create(ctx, &input)
+	// return stores.ForContext(ctx).CheckpointStore.Create(&input)
 }
 
 func (r *mutationResolver) CreateRoadmap(ctx context.Context, input models.NewRoadmap) (*models.Roadmap, error) {
-	return stores.ForContext(ctx).RoadmapStore.Create(&input)
+	return r.RoadmapUsecase.Create(ctx, &input)
+	// return stores.ForContext(ctx).RoadmapStore.Create(&input)
 }
 
 func (r *mutationResolver) ToggleFollowRoadmap(ctx context.Context, input models.FollowRoadmap) (*models.Roadmap, error) {
-	userId := auth.ForContext(ctx)
-	return stores.ForContext(ctx).RoadmapFollowerStore.ToggleFollowRoadmap(userId, &input)
+	userID := auth.ForContext(ctx)
+	return r.RoadmapFollowerUsecase.ToggleFollowRoadmap(ctx, userID, input.RoadmapID)
+	// return stores.ForContext(ctx).RoadmapFollowerStore.ToggleFollowRoadmap(userID, &input)
 }
 
 func (r *mutationResolver) UpdateCheckpointStatus(ctx context.Context, input models.UpdateStatus) (*models.Checkpoint, error) {
-	userId := auth.ForContext(ctx)
-	return stores.ForContext(ctx).CheckpointStore.UpdateStatus(userId, &input)
+	userID := auth.ForContext(ctx)
+	return r.CheckpointStatusUsecase.Update(ctx, userID, &input)
+	// return stores.ForContext(ctx).CheckpointStore.UpdateStatus(userID, &input)
 }
 
 // Mutation returns generated.MutationResolver implementation.

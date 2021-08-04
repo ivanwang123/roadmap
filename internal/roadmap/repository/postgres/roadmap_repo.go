@@ -41,11 +41,11 @@ func (r *roadmapRepo) GetByCreatorID(ctx context.Context, creatorID int) ([]*mod
 	return roadmaps, nil
 }
 
-func (r *roadmapRepo) GetByPagination(ctx context.Context, input repository.PaginationInput) ([]*models.Roadmap, error) {
+func (r *roadmapRepo) GetByPagination(ctx context.Context, input *models.GetRoadmaps) ([]*models.Roadmap, error) {
 	roadmaps := []*models.Roadmap{}
 
 	var query string
-	switch input.SortBy {
+	switch input.Sort {
 	case models.SortNewest:
 		query = "SELECT * FROM roadmaps WHERE (created_at, id) <= ($1, $2) ORDER BY created_at DESC, id DESC LIMIT $3"
 	case models.SortOldest:
@@ -62,4 +62,13 @@ func (r *roadmapRepo) GetByPagination(ctx context.Context, input repository.Pagi
 		return nil, err
 	}
 	return roadmaps, nil
+}
+
+func (r *roadmapRepo) Create(ctx context.Context, input *models.NewRoadmap) (*models.Roadmap, error) {
+	var roadmap models.Roadmap
+	if err := r.db.Get(&roadmap, "INSERT INTO roadmaps (title, description, creator_id) VALUES ($1, $2, $3) RETURNING *",
+		input.Title, input.Description, input.CreatorID); err != nil {
+		return nil, err
+	}
+	return &roadmap, nil
 }

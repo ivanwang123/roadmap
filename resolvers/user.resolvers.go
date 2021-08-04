@@ -8,7 +8,6 @@ import (
 
 	"github.com/ivanwang123/roadmap/graphql/generated"
 	"github.com/ivanwang123/roadmap/internal/loaders"
-	"github.com/ivanwang123/roadmap/internal/stores"
 	"github.com/ivanwang123/roadmap/models"
 )
 
@@ -17,7 +16,8 @@ func (r *userResolver) FollowingRoadmaps(ctx context.Context, obj *models.User) 
 }
 
 func (r *userResolver) CreatedRoadmaps(ctx context.Context, obj *models.User) ([]*models.Roadmap, error) {
-	return stores.ForContext(ctx).RoadmapStore.GetByCreatorId(obj.ID)
+	return r.RoadmapUsecase.GetByCreatorID(ctx, obj.ID)
+	// return stores.ForContext(ctx).RoadmapStore.GetByCreatorId(obj.ID)
 }
 
 // User returns generated.UserResolver implementation.

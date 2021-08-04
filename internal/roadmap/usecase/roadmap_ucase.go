@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/ivanwang123/roadmap/internal/roadmap"
-	"github.com/ivanwang123/roadmap/internal/roadmap/repository"
 	"github.com/ivanwang123/roadmap/models"
 )
 
@@ -30,6 +29,10 @@ func (u *roadmapUsecase) GetByCreatorID(ctx context.Context, creatorID int) ([]*
 	return u.roadmapRepo.GetByCreatorID(ctx, creatorID)
 }
 
-func (u *roadmapUsecase) GetByPagination(ctx context.Context, input repository.PaginationInput) ([]*models.Roadmap, error) {
+func (u *roadmapUsecase) GetByPagination(ctx context.Context, input *models.GetRoadmaps) ([]*models.Roadmap, error) {
 	return u.roadmapRepo.GetByPagination(ctx, input)
+}
+
+func (u *roadmapUsecase) Create(ctx context.Context, input *models.NewRoadmap) (*models.Roadmap, error) {
+	return u.roadmapRepo.Create(ctx, input)
 }

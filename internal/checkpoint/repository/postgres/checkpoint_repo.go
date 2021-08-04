@@ -16,6 +16,14 @@ func NewCheckpointRepo(db *sqlx.DB) checkpoint.Repository {
 	return &checkpointRepo{db}
 }
 
+func (r *checkpointRepo) GetByID(ctx context.Context, ID int) (*models.Checkpoint, error) {
+	var checkpoint models.Checkpoint
+	if err := r.db.Get(&checkpoint, "SELECT * FROM checkpoints WHERE id = $1", ID); err != nil {
+		return nil, err
+	}
+	return &checkpoint, nil
+}
+
 func (r *checkpointRepo) GetByRoadmap(ctx context.Context, roadmapID int) ([]*models.Checkpoint, error) {
 	checkpoints := []*models.Checkpoint{}
 	if err := r.db.Select(&checkpoints, "SELECT * FROM checkpoints WHERE roadmap_id = $1",
@@ -25,28 +33,20 @@ func (r *checkpointRepo) GetByRoadmap(ctx context.Context, roadmapID int) ([]*mo
 	return checkpoints, nil
 }
 
+func (r *checkpointRepo) GetIDByRoadmap(ctx context.Context, roadmapID int) ([]int, error) {
+	checkpointIDs := []int{}
+	err := r.db.Select(&checkpointIDs, "SELECT id FROM checkpoints WHERE roadmap_id = $1", roadmapID)
+	if err != nil {
+		return nil, err
+	}
+	return checkpointIDs, nil
+}
+
 func (r *checkpointRepo) Create(ctx context.Context, input *models.NewCheckpoint) (*models.Checkpoint, error) {
-	// TODO: Put in transaction?
 	var checkpoint models.Checkpoint
 	if err := r.db.Get(&checkpoint, "INSERT INTO checkpoints (title, instructions, links, roadmap_id) VALUES ($1, $2, $3, $4) RETURNING *",
 		input.Title, input.Instructions, input.Links, input.RoadmapID); err != nil {
 		return nil, err
 	}
-
-	roadmapFollowers := []*models.RoadmapFollower{}
-	if err := r.db.Select(&roadmapFollowers, "SELECT * FROM roadmap_followers WHERE roadmap_id = $1", input.RoadmapID); err != nil {
-		return nil, err
-	}
-
-	newCheckpointStatuses := make([]*models.NewCheckpointStatus, len(roadmapFollowers))
-	for i, follower := range roadmapFollowers {
-		newCheckpointStatuses[i] = &models.NewCheckpointStatus{UserID: follower.UserID, CheckpointID: checkpoint.ID, RoadmapID: input.RoadmapID}
-	}
-
-	checkpointStatusStore := &CheckpointStatusStore{DB: s.DB}
-	if err := checkpointStatusStore.CreateManyCheckpointStatus(newCheckpointStatuses); err != nil {
-		return nil, err
-	}
-
 	return &checkpoint, nil
 }
