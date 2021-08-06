@@ -7,16 +7,15 @@ import (
 	"context"
 
 	"github.com/ivanwang123/roadmap/graphql/generated"
-	"github.com/ivanwang123/roadmap/internal/loaders"
 	"github.com/ivanwang123/roadmap/models"
 )
 
 func (r *roadmapFollowerResolver) User(ctx context.Context, obj *models.RoadmapFollower) (*models.User, error) {
-	return loaders.ForContext(ctx).UserById(obj.UserID)
+	return r.UserUsecase.BatchGet(ctx)(obj.UserID)
 }
 
 func (r *roadmapFollowerResolver) Roadmap(ctx context.Context, obj *models.RoadmapFollower) (*models.Roadmap, error) {
-	return loaders.ForContext(ctx).RoadmapById(obj.RoadmapID)
+	return r.RoadmapUsecase.BatchGet(ctx)(obj.RoadmapID)
 }
 
 // RoadmapFollower returns generated.RoadmapFollowerResolver implementation.

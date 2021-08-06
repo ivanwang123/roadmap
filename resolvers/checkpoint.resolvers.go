@@ -7,7 +7,6 @@ import (
 	"context"
 
 	"github.com/ivanwang123/roadmap/graphql/generated"
-	"github.com/ivanwang123/roadmap/internal/loaders"
 	"github.com/ivanwang123/roadmap/models"
 )
 
@@ -16,7 +15,7 @@ func (r *checkpointResolver) Links(ctx context.Context, obj *models.Checkpoint) 
 }
 
 func (r *checkpointResolver) Status(ctx context.Context, obj *models.Checkpoint) (*models.Status, error) {
-	checkpointStatus, err := loaders.ForContext(ctx).CheckpointStatus(obj.ID)
+	checkpointStatus, err := r.CheckpointStatusUsecase.BatchGet(ctx)(obj.ID)
 	if err != nil {
 		return nil, nil
 	}
@@ -28,7 +27,7 @@ func (r *checkpointResolver) Status(ctx context.Context, obj *models.Checkpoint)
 }
 
 func (r *checkpointResolver) Roadmap(ctx context.Context, obj *models.Checkpoint) (*models.Roadmap, error) {
-	return loaders.ForContext(ctx).RoadmapById(obj.RoadmapID)
+	return r.RoadmapUsecase.BatchGet(ctx)(obj.RoadmapID)
 }
 
 // Checkpoint returns generated.CheckpointResolver implementation.

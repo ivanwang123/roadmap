@@ -15,11 +15,11 @@ type checkpointUsecase struct {
 	roadmapFollowerRepo  roadmap_follower.Repository
 }
 
-func NewCheckpointUsecase(checkpointRepo checkpoint.Repository, checkpointStatusRepo checkpoint_status.Repository, roadmapFollowerRepo roadmap_follower.Repository) checkpoint.Usecase {
+func NewCheckpointUsecase(c checkpoint.Repository, cs checkpoint_status.Repository, rf roadmap_follower.Repository) checkpoint.Usecase {
 	return &checkpointUsecase{
-		checkpointRepo:       checkpointRepo,
-		checkpointStatusRepo: checkpointStatusRepo,
-		roadmapFollowerRepo:  roadmapFollowerRepo,
+		checkpointRepo:       c,
+		checkpointStatusRepo: cs,
+		roadmapFollowerRepo:  rf,
 	}
 }
 
@@ -35,30 +35,60 @@ func (u *checkpointUsecase) GetIDByRoadmap(ctx context.Context, roadmapID int) (
 	return u.checkpointRepo.GetIDByRoadmap(ctx, roadmapID)
 }
 
-// TODO: Put in transaction?
 func (u *checkpointUsecase) Create(ctx context.Context, input *models.NewCheckpoint) (*models.Checkpoint, error) {
-	checkpoint, err := u.checkpointRepo.Create(ctx, input)
-	if err != nil {
-		return nil, err
-	}
-
-	roadmapFollowers, err := u.roadmapFollowerRepo.GetByRoadmap(ctx, input.RoadmapID)
-	if err != nil {
-		return nil, err
-	}
-
-	newCheckpointStatuses := make([]*models.CreateCheckpointStatus, len(roadmapFollowers))
-	for i, follower := range roadmapFollowers {
-		newCheckpointStatuses[i] = &models.CreateCheckpointStatus{
-			UserID:       follower.UserID,
-			CheckpointID: checkpoint.ID,
-			RoadmapID:    input.RoadmapID,
+	var checkpoint *models.Checkpoint
+	err := u.checkpointRepo.WithTransaction(ctx, func(txCtx context.Context) error {
+		checkpoint, err := u.checkpointRepo.Create(txCtx, input)
+		if err != nil {
+			return err
 		}
-	}
 
-	if err := u.checkpointStatusRepo.CreateMany(ctx, newCheckpointStatuses); err != nil {
+		roadmapFollowers, err := u.roadmapFollowerRepo.GetByRoadmap(txCtx, input.RoadmapID)
+		if err != nil {
+			return err
+		}
+
+		newCheckpointStatuses := make([]*models.CreateCheckpointStatus, len(roadmapFollowers))
+		for i, follower := range roadmapFollowers {
+			newCheckpointStatuses[i] = &models.CreateCheckpointStatus{
+				UserID:       follower.UserID,
+				CheckpointID: checkpoint.ID,
+				RoadmapID:    input.RoadmapID,
+			}
+		}
+
+		if err := u.checkpointStatusRepo.CreateMany(txCtx, newCheckpointStatuses); err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
 		return nil, err
 	}
+	return checkpoint, nil
+}
 
+func (u *checkpointUsecase) UpdateStatus(ctx context.Context, userID int, input *models.UpdateStatus) (*models.Checkpoint, error) {
+	var checkpoint *models.Checkpoint
+	err := u.checkpointRepo.WithTransaction(ctx, func(txCtx context.Context) error {
+		checkpoint, err := u.checkpointRepo.GetByID(ctx, input.CheckpointID)
+		if err != nil {
+			return err
+		}
+
+		err = u.checkpointStatusRepo.Update(ctx, userID, input)
+		if err != nil {
+			return err
+		}
+
+		checkpoint.Status = models.StatusType(input.Status)
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
 	return checkpoint, nil
 }

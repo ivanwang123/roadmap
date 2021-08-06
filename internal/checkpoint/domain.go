@@ -3,6 +3,7 @@ package checkpoint
 import (
 	"context"
 
+	"github.com/ivanwang123/roadmap/internal/common/transaction"
 	"github.com/ivanwang123/roadmap/models"
 )
 
@@ -11,6 +12,7 @@ type Repository interface {
 	GetByRoadmap(ctx context.Context, roadmapID int) ([]*models.Checkpoint, error)
 	GetIDByRoadmap(ctx context.Context, roadmapID int) ([]int, error)
 	Create(ctx context.Context, input *models.NewCheckpoint) (*models.Checkpoint, error)
+	WithTransaction(ctx context.Context, fn transaction.TxFunc) error
 }
 
 type Usecase interface {
@@ -18,4 +20,5 @@ type Usecase interface {
 	GetByRoadmap(ctx context.Context, roadmapID int) ([]*models.Checkpoint, error)
 	GetIDByRoadmap(ctx context.Context, roadmapID int) ([]int, error)
 	Create(ctx context.Context, input *models.NewCheckpoint) (*models.Checkpoint, error)
+	UpdateStatus(ctx context.Context, userID int, input *models.UpdateStatus) (*models.Checkpoint, error)
 }

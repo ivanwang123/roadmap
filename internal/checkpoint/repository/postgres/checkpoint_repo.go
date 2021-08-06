@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/ivanwang123/roadmap/internal/checkpoint"
+	"github.com/ivanwang123/roadmap/internal/common/transaction"
 	"github.com/ivanwang123/roadmap/models"
 	"github.com/jmoiron/sqlx"
 )
@@ -18,7 +19,8 @@ func NewCheckpointRepo(db *sqlx.DB) checkpoint.Repository {
 
 func (r *checkpointRepo) GetByID(ctx context.Context, ID int) (*models.Checkpoint, error) {
 	var checkpoint models.Checkpoint
-	if err := r.db.Get(&checkpoint, "SELECT * FROM checkpoints WHERE id = $1", ID); err != nil {
+	conn := transaction.GetConn(ctx, r.db)
+	if err := conn.Get(&checkpoint, "SELECT * FROM checkpoints WHERE id = $1", ID); err != nil {
 		return nil, err
 	}
 	return &checkpoint, nil
@@ -26,7 +28,8 @@ func (r *checkpointRepo) GetByID(ctx context.Context, ID int) (*models.Checkpoin
 
 func (r *checkpointRepo) GetByRoadmap(ctx context.Context, roadmapID int) ([]*models.Checkpoint, error) {
 	checkpoints := []*models.Checkpoint{}
-	if err := r.db.Select(&checkpoints, "SELECT * FROM checkpoints WHERE roadmap_id = $1",
+	conn := transaction.GetConn(ctx, r.db)
+	if err := conn.Select(&checkpoints, "SELECT * FROM checkpoints WHERE roadmap_id = $1",
 		roadmapID); err != nil {
 		return nil, err
 	}
@@ -35,7 +38,8 @@ func (r *checkpointRepo) GetByRoadmap(ctx context.Context, roadmapID int) ([]*mo
 
 func (r *checkpointRepo) GetIDByRoadmap(ctx context.Context, roadmapID int) ([]int, error) {
 	checkpointIDs := []int{}
-	err := r.db.Select(&checkpointIDs, "SELECT id FROM checkpoints WHERE roadmap_id = $1", roadmapID)
+	conn := transaction.GetConn(ctx, r.db)
+	err := conn.Select(&checkpointIDs, "SELECT id FROM checkpoints WHERE roadmap_id = $1", roadmapID)
 	if err != nil {
 		return nil, err
 	}
@@ -44,9 +48,14 @@ func (r *checkpointRepo) GetIDByRoadmap(ctx context.Context, roadmapID int) ([]i
 
 func (r *checkpointRepo) Create(ctx context.Context, input *models.NewCheckpoint) (*models.Checkpoint, error) {
 	var checkpoint models.Checkpoint
-	if err := r.db.Get(&checkpoint, "INSERT INTO checkpoints (title, instructions, links, roadmap_id) VALUES ($1, $2, $3, $4) RETURNING *",
+	conn := transaction.GetConn(ctx, r.db)
+	if err := conn.Get(&checkpoint, "INSERT INTO checkpoints (title, instructions, links, roadmap_id) VALUES ($1, $2, $3, $4) RETURNING *",
 		input.Title, input.Instructions, input.Links, input.RoadmapID); err != nil {
 		return nil, err
 	}
 	return &checkpoint, nil
+}
+
+func (r *checkpointRepo) WithTransaction(ctx context.Context, fn transaction.TxFunc) error {
+	return transaction.NewTransaction(ctx, r.db, fn)
 }

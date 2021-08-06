@@ -3,7 +3,6 @@ package auth
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -11,7 +10,7 @@ import (
 	"github.com/ivanwang123/roadmap/internal/common/cookie"
 )
 
-var userIdCtxKey = "user_id"
+var userIDCtxKey = "user_id"
 
 func Middleware() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
@@ -44,7 +43,7 @@ func Middleware() func(http.Handler) http.Handler {
 			}
 
 			if userId > 0 {
-				ctx := context.WithValue(r.Context(), userIdCtxKey, userId)
+				ctx := context.WithValue(r.Context(), userIDCtxKey, userId)
 				r = r.WithContext(ctx)
 			}
 			next.ServeHTTP(w, r)
@@ -80,13 +79,12 @@ func RefreshToken(r *http.Request) (int, error) {
 	return userId, nil
 }
 
-func ForContext(ctx context.Context) int {
-	raw := ctx.Value(userIdCtxKey)
-	fmt.Println("AUTH RAW", raw)
+func GetCurrentUser(ctx context.Context) (int, error) {
+	raw := ctx.Value(userIDCtxKey)
 	if raw != nil {
-		return raw.(int)
+		return raw.(int), nil
 	} else {
-		return -1
+		return -1, errors.New("User is unauthenticated")
 	}
 }
 
