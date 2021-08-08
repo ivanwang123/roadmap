@@ -1,4 +1,4 @@
-.PHONY: create up down force generate dataloader air
+.PHONY: create up down force generate dataloader air mock
 
 create:
 	migrate create -ext sql -dir database/migrations/ -seq add_checkpoints
@@ -20,3 +20,6 @@ dataloader:
 
 air:
 	air -c .air.toml
+
+mock:
+	mockery --name=Repository --recursive --dir=internal/user --output=./tests/mocks --filename=user_repo_mock.go --structname=UserMockRepo

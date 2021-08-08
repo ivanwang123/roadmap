@@ -14,7 +14,6 @@ import (
 	"github.com/ivanwang123/roadmap/models"
 )
 
-// TODO: Replace store
 func (r *mutationResolver) Login(ctx context.Context, input models.Login) (*models.User, error) {
 	user, err := r.UserUsecase.Authenticate(ctx, &input)
 	// user, err := stores.ForContext(ctx).UserStore.Authenticate(&input)

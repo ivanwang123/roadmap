@@ -56,7 +56,8 @@ func (u *roadmapUsecase) Create(ctx context.Context, input *models.NewRoadmap) (
 func (u *roadmapUsecase) ToggleFollow(ctx context.Context, userID, roadmapID int) (*models.Roadmap, error) {
 	var roadmap *models.Roadmap
 	err := u.roadmapRepo.WithTransaction(ctx, func(ctx context.Context) error {
-		err := u.roadmapFollowerRepo.Create(ctx, userID, roadmapID)
+		var err error
+		err = u.roadmapFollowerRepo.Create(ctx, userID, roadmapID)
 		if err != nil {
 			err = u.roadmapFollowerRepo.Delete(ctx, userID, roadmapID)
 

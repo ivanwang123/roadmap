@@ -1,3 +1,10 @@
+# Setup
+
+1. cd server
+2. make air
+3. cd web
+4. yarn dev
+
 # TODO
 
 - Pagination
@@ -44,4 +51,6 @@
 - Go
 - Gqlgen
 - Dataloader
+- Testify
+- Testfixtures
 - Cypress

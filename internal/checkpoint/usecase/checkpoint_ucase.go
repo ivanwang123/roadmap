@@ -23,6 +23,10 @@ func NewCheckpointUsecase(c checkpoint.Repository, cs checkpoint_status.Reposito
 	}
 }
 
+func SetRepo(c *checkpointUsecase) {
+
+}
+
 func (u *checkpointUsecase) GetByID(ctx context.Context, ID int) (*models.Checkpoint, error) {
 	return u.checkpointRepo.GetByID(ctx, ID)
 }
@@ -37,8 +41,10 @@ func (u *checkpointUsecase) GetIDByRoadmap(ctx context.Context, roadmapID int) (
 
 func (u *checkpointUsecase) Create(ctx context.Context, input *models.NewCheckpoint) (*models.Checkpoint, error) {
 	var checkpoint *models.Checkpoint
+
 	err := u.checkpointRepo.WithTransaction(ctx, func(txCtx context.Context) error {
-		checkpoint, err := u.checkpointRepo.Create(txCtx, input)
+		var err error
+		checkpoint, err = u.checkpointRepo.Create(txCtx, input)
 		if err != nil {
 			return err
 		}
@@ -72,8 +78,10 @@ func (u *checkpointUsecase) Create(ctx context.Context, input *models.NewCheckpo
 
 func (u *checkpointUsecase) UpdateStatus(ctx context.Context, userID int, input *models.UpdateStatus) (*models.Checkpoint, error) {
 	var checkpoint *models.Checkpoint
+
 	err := u.checkpointRepo.WithTransaction(ctx, func(txCtx context.Context) error {
-		checkpoint, err := u.checkpointRepo.GetByID(ctx, input.CheckpointID)
+		var err error
+		checkpoint, err = u.checkpointRepo.GetByID(ctx, input.CheckpointID)
 		if err != nil {
 			return err
 		}
