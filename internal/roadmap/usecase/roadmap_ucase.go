@@ -55,13 +55,17 @@ func (u *roadmapUsecase) Create(ctx context.Context, input *models.NewRoadmap) (
 
 func (u *roadmapUsecase) ToggleFollow(ctx context.Context, userID, roadmapID int) (*models.Roadmap, error) {
 	var roadmap *models.Roadmap
-	err := u.roadmapRepo.WithTransaction(ctx, func(ctx context.Context) error {
-		var err error
-		err = u.roadmapFollowerRepo.Create(ctx, userID, roadmapID)
-		if err != nil {
-			err = u.roadmapFollowerRepo.Delete(ctx, userID, roadmapID)
 
-			checkpointIDs, err := u.checkpointRepo.GetIDByRoadmap(ctx, roadmapID)
+	follower, _ := u.roadmapFollowerRepo.Get(ctx, userID, roadmapID)
+
+	err := u.roadmapRepo.WithTransaction(ctx, func(txCtx context.Context) error {
+		checkpointIDs, err := u.checkpointRepo.GetIDByRoadmap(txCtx, roadmapID)
+		if err != nil {
+			return err
+		}
+
+		if follower != nil {
+			err = u.roadmapFollowerRepo.Delete(txCtx, userID, roadmapID)
 			if err != nil {
 				return err
 			}
@@ -71,28 +75,25 @@ func (u *roadmapUsecase) ToggleFollow(ctx context.Context, userID, roadmapID int
 				UserIDs:       []int{userID},
 				CheckpointIDs: checkpointIDs,
 			}
-			if err := u.checkpointStatusRepo.DeleteMany(ctx, deleteCheckpointStatuses); err != nil {
+			if err = u.checkpointStatusRepo.DeleteMany(txCtx, deleteCheckpointStatuses); err != nil {
+				return err
+			}
+		} else {
+			err = u.roadmapFollowerRepo.Create(ctx, userID, roadmapID)
+			if err != nil {
 				return err
 			}
 
-			roadmap, err = u.roadmapRepo.GetByID(ctx, roadmapID)
-			return err
+			newCheckpointStatuses := make([]*models.CreateCheckpointStatus, len(checkpointIDs))
+			for i, checkpointId := range checkpointIDs {
+				newCheckpointStatuses[i] = &models.CreateCheckpointStatus{UserID: userID, CheckpointID: int(checkpointId), RoadmapID: roadmapID}
+			}
+			if err = u.checkpointStatusRepo.CreateMany(txCtx, newCheckpointStatuses); err != nil {
+				return err
+			}
 		}
 
-		checkpointIDs, err := u.checkpointRepo.GetIDByRoadmap(ctx, roadmapID)
-		if err != nil {
-			return err
-		}
-
-		newCheckpointStatuses := make([]*models.CreateCheckpointStatus, len(checkpointIDs))
-		for i, checkpointId := range checkpointIDs {
-			newCheckpointStatuses[i] = &models.CreateCheckpointStatus{UserID: userID, CheckpointID: int(checkpointId), RoadmapID: roadmapID}
-		}
-		if err := u.checkpointStatusRepo.CreateMany(ctx, newCheckpointStatuses); err != nil {
-			return err
-		}
-
-		roadmap, err = u.roadmapRepo.GetByID(ctx, roadmapID)
+		roadmap, err = u.roadmapRepo.GetByID(txCtx, roadmapID)
 		return err
 	})
 

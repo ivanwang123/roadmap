@@ -1,4 +1,4 @@
-# Setup
+# SETUP
 
 1. cd server
 2. make air
@@ -53,4 +53,4 @@
 - Dataloader
 - Testify
 - Testfixtures
-- Cypress
+- Cypress - replace with Jest?

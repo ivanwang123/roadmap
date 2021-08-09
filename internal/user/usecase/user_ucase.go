@@ -52,7 +52,7 @@ func (u *userUsecase) Authenticate(ctx context.Context, input *models.Login) (*m
 	} else if input.Username != nil {
 		user, err = u.userRepo.GetByUsername(ctx, *input.Username)
 	} else {
-		err = errors.New("Missing credentials")
+		err = errors.New("missing credentials")
 	}
 
 	if err != nil {
@@ -60,7 +60,7 @@ func (u *userUsecase) Authenticate(ctx context.Context, input *models.Login) (*m
 	}
 
 	if !repository.CheckPasswordHash(user.Password, input.Password) {
-		return nil, errors.New("Incorrect password")
+		return nil, errors.New("incorrect password")
 	}
 
 	return user, nil

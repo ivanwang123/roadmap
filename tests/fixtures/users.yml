@@ -1,14 +1,14 @@
 - id: 1
   username: "test"
   email: "test@test.com"
-  password: "********"
+  password: "$2a$14$LVEA.GUDr05OQNBdkvNUA.cXHN8Atru3aj65rsdkhd5pVLAA7bl3K" # password
 
 - id: 2
   username: "test2"
   email: "test2@test.com"
-  password: "********"
+  password: "$2a$14$LVEA.GUDr05OQNBdkvNUA.cXHN8Atru3aj65rsdkhd5pVLAA7bl3K" # password
 
 - id: 3
   username: "test3"
   email: "test3@test.com"
-  password: "********"
+  password: "$2a$14$LVEA.GUDr05OQNBdkvNUA.cXHN8Atru3aj65rsdkhd5pVLAA7bl3K" # password
