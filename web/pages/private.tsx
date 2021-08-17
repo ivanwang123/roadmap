@@ -1,9 +1,8 @@
-import React from "react";
-import withAuth, { AuthChildProps } from "../hoc/withAuth";
+import { Layout } from "components/layout";
+import { withAuth, WithAuthProps } from "modules/auth";
 import Router from "next/router";
-import Redirecting from "../components/Redirecting";
-import Loading from "../components/Loading";
-import Layout from "../components/Layout";
+import React from "react";
+import { Loading, Redirecting } from "../components/placeholder";
 
 type InputProps = {
   roadmaps: string[];
@@ -12,7 +11,7 @@ type InputProps = {
 function Private({
   data: { me, loading, error },
   roadmaps,
-}: AuthChildProps<InputProps>) {
+}: WithAuthProps<InputProps>) {
   console.log("ROADMAPS", roadmaps);
   if (loading) return <Loading />;
   if (error) {

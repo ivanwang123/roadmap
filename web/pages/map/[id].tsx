@@ -1,41 +1,21 @@
 import { useQuery } from "@apollo/client";
+import { Icon } from "components/element";
+import { Layout } from "components/layout";
+import { Loading } from "components/placeholder";
 import dayjs from "dayjs";
+import { addApolloState, getApolloClient } from "lib/apollo-client";
+import { withAuth, WithAuthProps } from "modules/auth";
+import { Checkpoint, CheckpointStatus } from "modules/checkpoint";
+import { FollowButton, ROADMAP_QUERY } from "modules/roadmap";
 import { GetServerSideProps } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
-import Checkpoint from "../../components/Checkpoint";
-import CheckpointStatus from "../../components/CheckpointStatus";
-import FollowButton from "../../components/FollowButton";
-import Icon from "../../components/Icon";
-import Layout from "../../components/Layout";
-import Loading from "../../components/Loading";
-import {
-  RoadmapQuery,
-  RoadmapQueryVariables,
-} from "../../graphql/generated/generated";
-import { ROADMAP_QUERY } from "../../graphql/queries/roadmapById";
-import withAuth, { AuthChildProps } from "../../hoc/withAuth";
-import { addApolloState, getApolloClient } from "../../lib/apollo-client";
-import Book from "../../svgs/book.svg";
-import Flag from "../../svgs/flag-big.svg";
+import Book from "svgs/book.svg";
+import Flag from "svgs/flag-big.svg";
+import { RoadmapQuery, RoadmapQueryVariables } from "types/graphql-generated";
 
-// function createObserver(el: Element | null) {
-//   if (el) {
-//     const options = {
-//       root: null,
-//       rootMargin: "-50% 0px 0px 0px",
-//       threshold: 1.0,
-//     };
-//     const observer = new IntersectionObserver(
-//       (observe) => console.log("OBSERVE", observe),
-//       options
-//     );
-//     observer.observe(el);
-//   }
-// }
-
-function Roadmap({ data: { me } }: AuthChildProps) {
+function Roadmap({ data: { me } }: WithAuthProps) {
   const router = useRouter();
   const { data, loading, error } = useQuery<
     RoadmapQuery,

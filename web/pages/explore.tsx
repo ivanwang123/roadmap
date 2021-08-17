@@ -1,14 +1,13 @@
 import { useQuery } from "@apollo/client";
+import { Layout } from "components/layout";
+import { Loading } from "components/placeholder";
+import { RoadmapCard, ROADMAPS_QUERY } from "modules/roadmap";
 import React, { useState } from "react";
-import Layout from "../components/Layout";
-import Loading from "../components/Loading";
-import RoadmapCard from "../components/RoadmapCard";
 import {
   RoadmapsQuery,
   RoadmapsQueryVariables,
   Sort,
-} from "../graphql/generated/generated";
-import { ROADMAPS_QUERY } from "../graphql/queries/roadmaps";
+} from "types/graphql-generated";
 
 function Explore() {
   const [sort, setSort] = useState<Sort>(Sort.MostFollowers);
@@ -66,7 +65,7 @@ function Explore() {
             </div>
           </div>
           {data?.roadmaps.map((roadmap) => (
-            <RoadmapCard roadmap={roadmap} />
+            <RoadmapCard roadmap={roadmap} key={roadmap.id} />
           ))}
         </section>
       </main>

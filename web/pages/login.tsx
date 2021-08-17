@@ -1,61 +1,23 @@
-import { useMutation } from "@apollo/client";
-import Link from "next/link";
-import Router, { useRouter } from "next/router";
+import { RedirectLink } from "components/element";
+import { Form, InputField, SubmitButton } from "components/form";
+import { Layout } from "components/layout";
+import { useLogin } from "modules/auth";
+import { Notification } from "modules/notification";
 import React from "react";
-import { useForm } from "react-hook-form";
-import { Input } from "../components/Input";
-import Layout from "../components/Layout";
-import { LOGIN_MUTATION } from "../graphql/mutations/login";
-import { ME_QUERY } from "../graphql/queries/me";
-import { getApolloClient } from "../lib/apollo-client";
-import Loader from "../svgs/loader.svg";
+import { z } from "zod";
+
+type LoginValues = {
+  email: string;
+  password: string;
+};
+
+const schema = z.object({
+  email: z.string().email("Must be a valid email"),
+  password: z.string().min(1, "Password is required"),
+});
 
 function Login() {
-  // const [error, setError] = useState<boolean>(false);
-  // const [message, setMessage] = useState<string>("");
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
-
-  const [login, { loading }] = useMutation(LOGIN_MUTATION);
-
-  const onSubmit = (data: any) => {
-    console.log("SUBMIT", data);
-    login({
-      variables: data,
-      update: (cache, { data }) => {
-        console.log("LOGIN DATA", data);
-        if (!data || !data.login) {
-          return;
-        }
-
-        cache.writeQuery({
-          query: ME_QUERY,
-          data: {
-            me: data.login,
-          },
-        });
-      },
-    })
-      .then(() => {
-        console.log("LOGIN SUCCESS");
-        const client = getApolloClient();
-        client.resetStore();
-        if (Router.query.redirect !== undefined) {
-          Router.push(Router.query.redirect as string);
-        } else {
-          Router.push("/");
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        // setError(true);
-        // setMessage(err.message);
-      });
-  };
+  const { login, loading } = useLogin();
 
   return (
     <Layout title="Login | Roadmap">
@@ -66,74 +28,38 @@ function Login() {
           <h1 className="text-3xl text-gray-800 font-medium tracking-wide mt-8 mb-3">
             Log in
           </h1>
-          {/* TODO: Add error alerts */}
-          {/* <Alert message={"message"} error={error} /> */}
 
-          <form className="flex flex-col" onSubmit={handleSubmit(onSubmit)}>
-            <Input
-              id="email"
-              name="Email"
-              error={errors.email}
-              register={register("email", {
-                required: { value: true, message: "Email is required" },
-                pattern: {
-                  value: new RegExp(
-                    "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$"
-                  ),
-                  message: "Must be a valid email",
-                },
-              })}
-            />
+          <Form<LoginValues, typeof schema> onSubmit={login} schema={schema}>
+            {({ register, formState: { errors } }) => (
+              <>
+                <InputField
+                  label="Email"
+                  id="email"
+                  error={errors.email}
+                  register={register("email")}
+                />
 
-            <Input
-              id="password"
-              name="Password"
-              type="password"
-              error={errors.password}
-              register={register("password", {
-                required: { value: true, message: "Password is required" },
-              })}
-            />
+                <InputField
+                  label="Password"
+                  id="password"
+                  type="password"
+                  error={errors.password}
+                  register={register("password")}
+                />
 
-            <button
-              type="submit"
-              className="icon-btn-grid items-center bg-green-500 text-white font-medium tracking-wide py-2 rounded disabled:opacity-70"
-              disabled={loading}
-            >
-              <span className="justify-self-end">
-                {loading && (
-                  <Loader
-                    className="fill-current animate-spin mr-2"
-                    width={20}
-                    height={20}
-                  />
-                )}
-              </span>
-              <span>Log in</span>
-            </button>
-          </form>
+                <SubmitButton label="Log in" loading={loading} />
+              </>
+            )}
+          </Form>
+          <Notification type="text" style="mt-2" showOnly="error" />
 
           <div className="text-sm text-gray-500 text-center mt-6">
-            Don't have an account? <RedirectToSignup />
+            Don't have an account?{" "}
+            <RedirectLink label="Sign up" pathname="/register" />
           </div>
         </section>
       </main>
     </Layout>
-  );
-}
-
-function RedirectToSignup() {
-  const router = useRouter();
-  let href: any = {
-    pathname: "/register",
-  };
-  if (router.query.redirect !== undefined) {
-    href["query"] = { redirect: router.query.redirect };
-  }
-  return (
-    <Link href={href}>
-      <a className="text-blue-500 hover:underline">Sign up</a>
-    </Link>
   );
 }
 

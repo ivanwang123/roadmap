@@ -1,16 +1,13 @@
 import { useQuery } from "@apollo/client";
+import { Layout } from "components/layout";
+import { Loading } from "components/placeholder";
+import { addApolloState, getApolloClient } from "lib/apollo-client";
+import { RoadmapCard } from "modules/roadmap";
+import { USER_QUERY } from "modules/user";
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import React from "react";
-import Layout from "../../components/Layout";
-import Loading from "../../components/Loading";
-import RoadmapCard from "../../components/RoadmapCard";
-import {
-  UserQuery,
-  UserQueryVariables,
-} from "../../graphql/generated/generated";
-import { USER_QUERY } from "../../graphql/queries/userById";
-import { addApolloState, getApolloClient } from "../../lib/apollo-client";
+import { UserQuery, UserQueryVariables } from "types/graphql-generated";
 
 function UserProfile() {
   const router = useRouter();

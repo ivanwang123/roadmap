@@ -1,7 +1,7 @@
+import { InputField, TextareaField } from "components/form";
+import { Layout } from "components/layout";
 import React from "react";
 import { useForm } from "react-hook-form";
-import { Input, Textarea } from "../../components/Input";
-import Layout from "../../components/Layout";
 
 // Title, description, tags, checkpoints
 // Title, instructions, links, numbered?
@@ -26,17 +26,17 @@ function CreateMap() {
           </h1>
 
           <form onSubmit={handleSubmit(onSubmit)}>
-            <Input
+            <InputField
+              label="Title"
               id="title"
-              name="Title"
               error={errors.title}
               register={register("title", {
                 required: { value: true, message: "Title is required" },
               })}
             />
-            <Textarea
+            <TextareaField
+              label="Description"
               id="description"
-              name="Description"
               error={errors.description}
               register={register("description", {
                 required: { value: true, message: "Description is required" },

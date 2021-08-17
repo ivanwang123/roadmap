@@ -1,55 +1,25 @@
-import { useMutation } from "@apollo/client";
-import Link from "next/link";
-import Router, { useRouter } from "next/router";
+import { RedirectLink } from "components/element";
+import { Form, InputField, SubmitButton } from "components/form";
+import { Layout } from "components/layout";
+import { useRegister } from "modules/auth";
+import { Notification } from "modules/notification";
 import React from "react";
-import { useForm } from "react-hook-form";
-import Layout from "../components/Layout";
-import { REGISTER_MUTATION } from "../graphql/mutations/register";
-import { ME_QUERY } from "../graphql/queries/me";
-import { getApolloClient } from "../lib/apollo-client";
+import { z } from "zod";
+
+type RegisterValues = {
+  email: string;
+  username: string;
+  password: string;
+};
+
+const schema = z.object({
+  email: z.string().email("Must be a valid email"),
+  username: z.string().min(1, "Username is required"),
+  password: z.string().min(8, "Password must be at least 8 characters long"),
+});
 
 function Register() {
-  const [signup] = useMutation(REGISTER_MUTATION);
-  // const [error, setError] = useState<boolean>(false);
-  // const [message, setMessage] = useState<string>("");
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
-
-  const onSubmit = (data: any) => {
-    console.log("SUBMIT", data);
-    signup({
-      variables: data,
-      update: (cache, { data }) => {
-        if (!data || !data.createUser) {
-          return;
-        }
-
-        cache.writeQuery({
-          query: ME_QUERY,
-          data: {
-            me: data.createUser,
-          },
-        });
-      },
-    })
-      .then(() => {
-        const client = getApolloClient();
-        client.resetStore();
-        if (Router.query.redirect !== undefined) {
-          Router.push(Router.query.redirect as string);
-        } else {
-          Router.push("/");
-        }
-      })
-      .catch((_err) => {
-        // setError(true);
-        // setMessage(err.message);
-      });
-  };
+  const { register: signup, loading } = useRegister();
 
   return (
     <Layout title="Sign up | Roadmap">
@@ -59,113 +29,46 @@ function Register() {
           <h1 className="text-3xl text-gray-800 font-medium tracking-wide mt-8 mb-3">
             Sign up
           </h1>
-          {/* <Alert message={message} error={error} /> */}
 
-          <form className="flex flex-col" onSubmit={handleSubmit(onSubmit)}>
-            <div className="flex flex-col my-8">
-              <label
-                htmlFor="email"
-                className="text-gray-800 font-medium tracking-wide"
-              >
-                Email
-              </label>
-              <input
-                type="text"
-                id="email"
-                className={`border-b-2 pt-1 focus:border-gray-800 focus:outline-none ${
-                  errors.email && "border-red-500"
-                }`}
-                {...register("email", {
-                  required: { value: true, message: "Email is required" },
-                  pattern: {
-                    value: new RegExp(
-                      "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$"
-                    ),
-                    message: "Must be a valid email",
-                  },
-                })}
-              />
-              <span className="h-6 text-red-500 mt-1">
-                {errors.email?.message}
-              </span>
-            </div>
+          <Form<RegisterValues, typeof schema>
+            onSubmit={signup}
+            schema={schema}
+          >
+            {({ register, formState: { errors } }) => (
+              <>
+                <InputField
+                  label="Email"
+                  id="email"
+                  error={errors.email}
+                  register={register("email")}
+                />
+                <InputField
+                  label="Username"
+                  id="username"
+                  error={errors.username}
+                  register={register("username")}
+                />
+                <InputField
+                  label="Password"
+                  id="password"
+                  type="password"
+                  error={errors.password}
+                  register={register("password")}
+                />
 
-            <div className="flex flex-col mb-8">
-              <label
-                htmlFor="username"
-                className="text-gray-800 font-medium tracking-wide"
-              >
-                Username
-              </label>
-              <input
-                type="text"
-                id="username"
-                className={`border-b-2 pt-1 focus:border-gray-800 focus:outline-none ${
-                  errors.email && "border-red-500"
-                }`}
-                {...register("username", {
-                  required: { value: true, message: "Username is required" },
-                  maxLength: {
-                    value: 20,
-                    message: "Username must be less than 20 characters long",
-                  },
-                })}
-              />
-              <span className="h-6 text-red-500 mt-1">
-                {errors.username?.message}
-              </span>
-            </div>
+                <SubmitButton label="Sign up" loading={loading} />
+              </>
+            )}
+          </Form>
+          <Notification type="text" style="mt-2" showOnly="error" />
 
-            <div className="flex flex-col mb-8">
-              <label
-                htmlFor="password"
-                className="text-gray-800 font-medium tracking-wide"
-              >
-                Password
-              </label>
-              <input
-                type="password"
-                id="password"
-                className={`border-b-2 pt-1 focus:border-gray-800 focus:outline-none ${
-                  errors.email && "border-red-500"
-                }`}
-                {...register("password", {
-                  required: { value: true, message: "Password is required" },
-                })}
-              />
-              <span className="h-6 text-red-500 mt-1">
-                {errors.password?.message}
-              </span>
-            </div>
-
-            <button
-              type="submit"
-              className="bg-green-500 text-white font-medium tracking-wide py-2 rounded"
-            >
-              Sign up
-            </button>
-          </form>
           <div className="text-sm text-gray-500 text-center mt-6">
-            Already have an account? <RedirectToLogin />
+            Already have an account?{" "}
+            <RedirectLink label="Log in" pathname="/login" />
           </div>
         </section>
       </main>
     </Layout>
-  );
-}
-
-function RedirectToLogin() {
-  const router = useRouter();
-  let href: any = {
-    pathname: "/login",
-  };
-  if (router.query.redirect !== undefined) {
-    href["query"] = { redirect: router.query.redirect };
-  }
-  return (
-    <Link href={href}>
-      <a className="text-blue-500 hover:underline">Log in</a>
-    </Link>
   );
 }
 
