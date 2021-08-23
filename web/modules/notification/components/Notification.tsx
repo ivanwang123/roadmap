@@ -47,9 +47,9 @@ function TextNotification({ notification, style }: TextProps) {
   );
 }
 
-type AlertProps = TextProps & {
+type AlertProps = {
   dismissNotification: () => void;
-};
+} & TextProps;
 
 function AlertNotification({
   notification,

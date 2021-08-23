@@ -93,9 +93,11 @@ export const getApolloClient = initializeApollo;
 
 export function addApolloState(
   client: ApolloClient<NormalizedCacheObject>,
-  pageProps: any
+  pageProps?: any
 ) {
-  if (pageProps?.props) {
+  if (!pageProps) return { props: {} };
+
+  if (pageProps.props) {
     pageProps.props[APOLLO_STATE_PROP_NAME] = client.cache.extract();
   }
 
@@ -107,64 +109,3 @@ export function useApollo(pageProps: any) {
   const store = useMemo(() => initializeApollo(state), [state]);
   return store;
 }
-
-// TODO: Deprecated
-
-// import {
-//   ApolloClient,
-//   HttpLink,
-//   InMemoryCache,
-//   NormalizedCacheObject,
-// } from "@apollo/client";
-// import { useMemo } from "react";
-
-// let apolloClient: ApolloClient<NormalizedCacheObject> | undefined;
-
-// function createApolloClient(): ApolloClient<any> {
-//   console.log("CREATE APOLLO CLIENT");
-//   return new ApolloClient({
-//     /**
-//      * Enable SSR mode when not running on the client-side
-//      */
-//     ssrMode: typeof window === "undefined",
-//     link: new HttpLink({
-//       uri: "http://localhost:8080/query",
-//       credentials: "include",
-//     }),
-//     cache: new InMemoryCache(),
-//     connectToDevTools: true,
-//   });
-// }
-
-// export function initializeApollo(initialState: any = null): ApolloClient<any> {
-//   const _apolloClient = apolloClient ?? createApolloClient();
-
-//   // If your page has Next.js data fetching methods that use Apollo Client, the initial state
-//   // get hydrated here
-//   if (initialState) {
-//     _apolloClient.cache.restore(initialState);
-//   }
-
-//   /**
-//    * SSG and SSR
-//    * Always create a new Apollo Client
-//    */
-//   if (typeof window === "undefined") {
-//     return _apolloClient;
-//   }
-
-//   // Create the Apollo Client once in the client
-//   apolloClient = apolloClient ?? _apolloClient;
-
-//   return apolloClient;
-// }
-
-// export const getApolloClient = initializeApollo;
-
-// export function useApollo(initialState: any) {
-//   const apolloStore = useMemo(
-//     () => initializeApollo(initialState),
-//     [initialState]
-//   );
-//   return apolloStore;
-// }

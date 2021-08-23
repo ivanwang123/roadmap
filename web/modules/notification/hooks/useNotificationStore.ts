@@ -9,9 +9,7 @@ type NotificationStore = {
 
 export const useNotificationStore = create<NotificationStore>((set) => ({
   notification: null,
-  setNotification: (notification) => {
-    set(() => ({ notification }));
-  },
+  setNotification: (notification) => set(() => ({ notification })),
   dismissNotification: () =>
     set(() => ({
       notification: null,

@@ -10,12 +10,15 @@ type Props = {
 
 export function FieldWrapper({ id, label, error, children }: Props) {
   return (
-    <div className="flex flex-col my-8">
-      <label htmlFor={id} className="text-gray-800 font-medium tracking-wide">
+    <div className="flex flex-col w-full my-2">
+      <label
+        htmlFor={id}
+        className="text-gray-500 text-sm font-medium tracking-wide mb-1"
+      >
         {label}
       </label>
       {children}
-      <span className="h-6 text-red-500 mt-1">{error?.message}</span>
+      <span className="h-4 text-red-500 text-sm mt-1">{error?.message}</span>
     </div>
   );
 }

@@ -2,8 +2,11 @@ import { ApolloProvider } from "@apollo/client";
 import { useApollo } from "lib/apollo-client";
 import { AppProps } from "next/app";
 import React from "react";
-import "styles/globals.css";
+
+// organize-imports-ignore
 import "styles/tailwind.css";
+import "animate.css";
+import "styles/globals.css";
 
 function App({ Component, pageProps }: AppProps) {
   const client = useApollo(pageProps);

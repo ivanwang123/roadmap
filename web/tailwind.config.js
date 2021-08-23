@@ -8,8 +8,8 @@ module.exports = {
     extend: {
       colors: {
         ...colors,
-        secondary: "#F5F7FB",
-        tertiary: "#F6F8FA",
+        secondary: "#F8F8F8", // "#F5F7FB",
+        tertiary: "#FAFAFA", // "#F6F8FA",
         hover: colors.blue["400"],
       },
       rotate: {
@@ -31,6 +31,7 @@ module.exports = {
       borderWidth: ["hover"],
       opacity: ["disabled"],
       fontWeight: ["hover"],
+      backgroundColor: ["hover", "active"],
     },
   },
   plugins: [require("@tailwindcss/line-clamp")],

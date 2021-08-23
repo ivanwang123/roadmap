@@ -26,45 +26,28 @@ function Register() {
       <main className="grid grid-cols-12">
         <section className="col-start-2 col-end-7"></section>
         <section className="max-w-sm col-start-7 col-end-12">
-          <h1 className="text-3xl text-gray-800 font-medium tracking-wide mt-8 mb-3">
-            Sign up
-          </h1>
+          <div className="bg-secondary p-8 mt-8 rounded-sm">
+            <h1 className="text-3xl text-gray-800 font-medium tracking-wide mb-3">
+              Sign up
+            </h1>
 
-          <Form<RegisterValues, typeof schema>
-            onSubmit={signup}
-            schema={schema}
-          >
-            {({ register, formState: { errors } }) => (
+            <Form<RegisterValues, typeof schema>
+              onSubmit={signup}
+              schema={schema}
+            >
               <>
-                <InputField
-                  label="Email"
-                  id="email"
-                  error={errors.email}
-                  register={register("email")}
-                />
-                <InputField
-                  label="Username"
-                  id="username"
-                  error={errors.username}
-                  register={register("username")}
-                />
-                <InputField
-                  label="Password"
-                  id="password"
-                  type="password"
-                  error={errors.password}
-                  register={register("password")}
-                />
-
+                <InputField label="EMAIL" id="email" />
+                <InputField label="USERNAME" id="username" />
+                <InputField label="PASSWORD" id="password" type="password" />
                 <SubmitButton label="Sign up" loading={loading} />
               </>
-            )}
-          </Form>
-          <Notification type="text" style="mt-2" showOnly="error" />
+            </Form>
+            <Notification type="text" style="mt-1" showOnly="error" />
 
-          <div className="text-sm text-gray-500 text-center mt-6">
-            Already have an account?{" "}
-            <RedirectLink label="Log in" pathname="/login" />
+            <div className="text-gray-500 text-sm text-center mt-6">
+              Already have an account?{" "}
+              <RedirectLink label="Log in" pathname="/login" />
+            </div>
           </div>
         </section>
       </main>

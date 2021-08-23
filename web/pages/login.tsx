@@ -25,37 +25,24 @@ function Login() {
         {/* TODO: Add side image */}
         <section className="col-start-2 col-end-7"></section>
         <section className="max-w-sm col-start-7 col-end-12">
-          <h1 className="text-3xl text-gray-800 font-medium tracking-wide mt-8 mb-3">
-            Log in
-          </h1>
+          <div className="bg-secondary p-8 mt-8 rounded-sm">
+            <h1 className="text-3xl text-gray-800 font-medium tracking-wide mb-3">
+              Log in
+            </h1>
 
-          <Form<LoginValues, typeof schema> onSubmit={login} schema={schema}>
-            {({ register, formState: { errors } }) => (
+            <Form<LoginValues, typeof schema> onSubmit={login} schema={schema}>
               <>
-                <InputField
-                  label="Email"
-                  id="email"
-                  error={errors.email}
-                  register={register("email")}
-                />
-
-                <InputField
-                  label="Password"
-                  id="password"
-                  type="password"
-                  error={errors.password}
-                  register={register("password")}
-                />
-
+                <InputField label="EMAIL" id="email" />
+                <InputField label="PASSWORD" id="password" type="password" />
                 <SubmitButton label="Log in" loading={loading} />
               </>
-            )}
-          </Form>
-          <Notification type="text" style="mt-2" showOnly="error" />
+            </Form>
+            <Notification type="text" style="mt-1" showOnly="error" />
 
-          <div className="text-sm text-gray-500 text-center mt-6">
-            Don't have an account?{" "}
-            <RedirectLink label="Sign up" pathname="/register" />
+            <div className="text-gray-500 text-sm text-center mt-6">
+              Don't have an account?{" "}
+              <RedirectLink label="Sign up" pathname="/register" />
+            </div>
           </div>
         </section>
       </main>

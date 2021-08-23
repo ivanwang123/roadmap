@@ -1,80 +1,59 @@
-import { InputField, TextareaField } from "components/form";
+import { Form, InputField, SubmitButton, TextareaField } from "components/form";
 import { Layout } from "components/layout";
+import { Notification } from "modules/notification";
+import { CheckpointsField, RoadmapValues, TagsField } from "modules/roadmap";
 import React from "react";
-import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-// Title, description, tags, checkpoints
-// Title, instructions, links, numbered?
-// TODO: Focus more on links?
+const schema = z.object({
+  title: z
+    .string()
+    .min(1, "Title is required")
+    .max(256, "Title must be less than 256 characters long"),
+  description: z.string().min(1, "Description is required"),
+  tags: z.array(z.string().min(1, "Tag can not be empty")).default([]),
+  checkpoints: z.array(
+    z.object({
+      title: z
+        .string()
+        .min(1, "Title is required")
+        .max(256, "Title must be between 1-256 characters long"),
+      instructions: z.string(),
+      links: z.array(z.string().min(1, "Link can not be empty")),
+    })
+  ),
+});
+
 function CreateMap() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
-
-  // const [checkpoints, setCheckpoints] = useState([]);
-
-  const onSubmit = () => {};
+  const onSubmit = (data: RoadmapValues) => {
+    console.log("DATA", data);
+  };
 
   return (
     <Layout title="Create | Roadmap">
-      <main className="grid grid-cols-12">
-        <section className="col-start-2 col-end-12 max-w-sm">
-          <h1 className="text-3xl text-gray-800 font-medium tracking-wide mt-8 mb-3">
+      <main className="flex justify-center w-full">
+        <section className="w-full max-w-sm pb-12">
+          <h1 className="text-3xl text-black font-semibold mt-8 mb-3">
             Create roadmap
           </h1>
 
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <InputField
-              label="Title"
-              id="title"
-              error={errors.title}
-              register={register("title", {
-                required: { value: true, message: "Title is required" },
-              })}
-            />
-            <TextareaField
-              label="Description"
-              id="description"
-              error={errors.description}
-              register={register("description", {
-                required: { value: true, message: "Description is required" },
-              })}
-            />
-          </form>
+          <Form<RoadmapValues, typeof schema>
+            onSubmit={onSubmit}
+            schema={schema}
+          >
+            <>
+              <InputField label="TITLE" id="title" />
+              <TextareaField label="DESCRIPTION" id="description" />
+              <TagsField />
+              <CheckpointsField />
+              <SubmitButton label="Create" loading={false} />
+            </>
+          </Form>
+          <Notification type="text" style="mt-1" showOnly="error" />
         </section>
       </main>
     </Layout>
   );
 }
-
-// function CreateCheckpoint() {
-//   const [title, setTitle] = useState<string>("");
-//   const [instructions, setInstructions] = useState<string>("");
-//   const [links, setLinks] = useState<string[]>([]);
-
-//   const handleAddLink = () => {};
-
-//   return (
-//     <div>
-//       <input
-//         type="text"
-//         value={title}
-//         onChange={(e) => setTitle(e.target.value)}
-//       />
-//       <textarea
-//         rows={3}
-//         value={instructions}
-//         onChange={(e) => setInstructions(e.target.value)}
-//       />
-//       <div>
-//         <button type="button" onClick={handleAddLink}>
-//           Add link
-//         </button>
-//       </div>
-//     </div>
-//   );
-// }
 
 export default CreateMap;

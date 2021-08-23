@@ -32,25 +32,35 @@
 
 /
 /explore
-/login
-/register
+/login - done
+/register - done
 /create/map
 /map/[id]
 /user/[id]
 /checkpoint/[id]?
 
+# FEATURES
+
+- Clean architecture
+- Integration testing
+- Server side rendering
+- Client side caching
+
 # TECHNOLOGIES
 
 - React
-- Nextjs
 - Typescript
+- Nextjs
 - Tailwindcss
 - Apollo
 - GraphQL
 - GraphQL Code Generator
+- Cypress
+- Storybook
+- Docker
+
 - Go
 - Gqlgen
 - Dataloader
 - Testify
 - Testfixtures
-- Cypress - replace with Jest?
