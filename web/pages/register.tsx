@@ -27,9 +27,7 @@ function Register() {
         <section className="col-start-2 col-end-7"></section>
         <section className="max-w-sm col-start-7 col-end-12">
           <div className="bg-secondary p-8 mt-8 rounded-sm">
-            <h1 className="text-3xl text-gray-800 font-medium tracking-wide mb-3">
-              Sign up
-            </h1>
+            <h1 className="text-3xl text-black font-semibold mb-3">Sign up</h1>
 
             <Form<RegisterValues, typeof schema>
               onSubmit={signup}

@@ -6,7 +6,7 @@ type Props = {
   checkpoints: RoadmapQuery["roadmap"]["checkpoints"];
 };
 
-export function Checkpoints({ checkpoints }: Props) {
+export function CheckpointList({ checkpoints }: Props) {
   const numCompletedCheckpoints = useCallback(() => {
     return checkpoints.filter((c) => c.status && c.status === Status.Complete)
       .length;

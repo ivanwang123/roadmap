@@ -15,7 +15,7 @@ export const SecondaryButton = forwardRef<HTMLButtonElement, Props>(
       <button
         ref={ref}
         type="button"
-        className="flex items-center justify-center text-black text-sm font-medium tracking-wide border border-gray-200 px-6 py-2 rounded-sm transition duration-300 hover:bg-gray-200 active:bg-gray-300 focus:outline-none"
+        className="flex items-center justify-center text-black text-sm font-medium tracking-wide border border-gray-200 px-6 py-1.5 rounded-sm transition duration-300 hover:bg-gray-200 active:bg-gray-300 focus:outline-none"
         {...rest}
       >
         {children}

@@ -21,6 +21,7 @@ export function CheckpointStatus({ id, title, status }: Props) {
           className="w-6 h-6 fill-current text-emerald-600 mx-auto"
           width={16}
           height={16}
+          data-testid="check-svg"
         />
       );
       break;
@@ -30,6 +31,7 @@ export function CheckpointStatus({ id, title, status }: Props) {
           className="w-6 h-6 fill-current text-yellow-500 mx-auto"
           width={16}
           height={16}
+          data-testid="skip-svg"
         />
       );
       break;
@@ -40,6 +42,7 @@ export function CheckpointStatus({ id, title, status }: Props) {
             className="fill-current text-gray-200 my-auto"
             width={8}
             height={8}
+            data-testid="circle-svg"
           />
         </span>
       );

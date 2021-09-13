@@ -28,6 +28,7 @@ export function CheckpointsField() {
             links: [],
           })
         }
+        data-testid="add-checkpoint"
       >
         <Add className="w-5 h-5 fill-current mr-2" />
       </PrimaryButton>

@@ -1,4 +1,5 @@
 import { useQuery } from "@apollo/client";
+import clsx from "clsx";
 import { Layout } from "components/layout";
 import { Loading } from "components/placeholder";
 import { RoadmapCard, ROADMAPS_QUERY } from "modules/roadmap";
@@ -31,36 +32,39 @@ function Explore() {
   return (
     <Layout title="Explore | Roadmap">
       <main className="grid grid-cols-12">
-        <section className="col-start-4 col-end-11">
-          <h1 className="text-3xl text-gray-800 font-medium mt-14 mb-6">
+        <section className="col-start-4 col-end-10">
+          <h1 className="text-3xl text-black font-semibold mt-14 mb-6">
             Explore
           </h1>
-          <div className="flex text-gray-400 text-sm font-light tracking-wide">
+          <div className="flex text-gray-400 text-sm tracking-wide border-b">
             <div
-              className={`w-16 text-center mr-4 cursor-pointer hover:text-gray-800 ${
-                sort === Sort.MostFollowers ? "text-gray-800 font-medium" : ""
-              }`}
+              className={clsx(
+                "w-16 text-center border-b-3 border-white pb-2 mr-4 cursor-pointer hover:text-black",
+                sort === Sort.MostFollowers && "text-black border-blue-500"
+              )}
               onClick={() => setSort(Sort.MostFollowers)}
             >
               Popular
             </div>
             <div
-              className={`w-16 text-center mr-4 cursor-pointer hover:text-gray-800 ${
-                sort === Sort.Newest ? "text-gray-800 font-medium" : ""
-              }`}
+              className={clsx(
+                "w-16 text-center border-b-3 border-white pb-2 mr-4 cursor-pointer hover:text-black",
+                sort === Sort.Newest && "text-black border-blue-500"
+              )}
               onClick={() => setSort(Sort.Newest)}
             >
               New
             </div>
             <div
-              className={`w-28 text-center mr-4 cursor-pointer hover:text-gray-800 ${
-                sort === Sort.MostCheckpoints ? "text-gray-800 font-medium" : ""
-              }`}
+              className={clsx(
+                "w-28 text-center border-b-3 border-white pb-2 mr-4 cursor-pointer hover:text-black",
+                sort === Sort.MostCheckpoints && "text-black border-blue-500"
+              )}
               onClick={() => setSort(Sort.MostCheckpoints)}
             >
               ^ Checkpoints
             </div>
-            <div className="w-28 text-center mr-4 cursor-pointer hover:text-gray-800">
+            <div className="w-28 text-center mr-4 cursor-pointer hover:text-black">
               ^ Resources
             </div>
           </div>

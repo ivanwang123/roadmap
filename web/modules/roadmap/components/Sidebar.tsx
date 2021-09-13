@@ -1,5 +1,5 @@
 import { Icon } from "components/element";
-import { Checkpoints } from "modules/checkpoint";
+import { CheckpointList } from "modules/checkpoint";
 import React from "react";
 import Book from "svgs/book.svg";
 import Flag from "svgs/flag-big.svg";
@@ -42,7 +42,7 @@ export function Sidebar({ roadmap, me }: Props) {
           </div>
         </div>
 
-        <Checkpoints checkpoints={roadmap.checkpoints} />
+        <CheckpointList checkpoints={roadmap.checkpoints} />
       </div>
     </section>
   );

@@ -72,7 +72,7 @@ export function LinksField({ checkpointIdx }: Props) {
           onChange={(e) => setLink(e.target.value)}
         >
           <span className="flex justify-center items-center ml-2">
-            <PrimaryButton onClick={appendLink}>
+            <PrimaryButton onClick={appendLink} data-testid="add-link">
               <Add className="w-5 h-5 fill-current" />
             </PrimaryButton>
           </span>

@@ -49,14 +49,16 @@ func (u *userUsecase) Authenticate(ctx context.Context, input *models.Login) (*m
 	var err error
 	if input.Email != nil {
 		user, err = u.userRepo.GetByEmail(ctx, *input.Email)
+		if err != nil {
+			return nil, errors.New("no user with that email")
+		}
 	} else if input.Username != nil {
 		user, err = u.userRepo.GetByUsername(ctx, *input.Username)
+		if err != nil {
+			return nil, errors.New("no user with that username")
+		}
 	} else {
-		err = errors.New("missing credentials")
-	}
-
-	if err != nil {
-		return nil, err
+		return nil, errors.New("missing credentials")
 	}
 
 	if !repository.CheckPasswordHash(user.Password, input.Password) {

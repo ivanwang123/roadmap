@@ -5,6 +5,7 @@ import Book from "svgs/book.svg";
 import Flag from "svgs/flag-big.svg";
 import User from "svgs/user.svg";
 import { RoadmapInfoFieldsFragment } from "types/graphql-generated";
+import { pluralize } from "utils";
 
 type Props = {
   roadmap: RoadmapInfoFieldsFragment;
@@ -25,14 +26,14 @@ export function RoadmapCard({}: Props) {
             JUL 17, 2020
           </div>
         </div>
-        <h3 className="text-lg font-semibold mb-2">
+        <h3 className="text-xl font-semibold mb-1">
           <Link href="/map/1">
             <a className="transition duration-300 hover:text-hover">
               Full stack developer
             </a>
           </Link>
         </h3>
-        <p className="text-gray-400 tracking-wide line-clamp-3 mb-4">
+        <p className="text-sm text-gray-400 tracking-wide line-clamp-3 mb-4">
           In this tutorial, you'll learn how to apply linear algebra concepts to
           practical problems, how to work with vectors and matrices using Python
           and NumPy, how to model practical problems using linear systems, and
@@ -42,19 +43,22 @@ export function RoadmapCard({}: Props) {
           <div className="flex items-center mr-8">
             <Icon icon={User} size={12} />
             <span className="ml-2">
-              <span className="font-semibold">12</span> followers
+              <span className="font-semibold">12</span>{" "}
+              {pluralize("follower", 12)}
             </span>
           </div>
           <div className="flex items-center mr-8">
             <Icon icon={Flag} size={12} />
             <span className="ml-2">
-              <span className="font-semibold">7</span> checkpoints
+              <span className="font-semibold">7</span>{" "}
+              {pluralize("checkpoint", 7)}
             </span>
           </div>
           <div className="flex items-center">
             <Icon icon={Book} size={12} />
             <span className="ml-2">
-              <span className="font-semibold">12</span> resources
+              <span className="font-semibold">12</span>{" "}
+              {pluralize("resource", 12)}
             </span>
           </div>
         </div>

@@ -41,6 +41,7 @@ function TextNotification({ notification, style }: TextProps) {
         notification?.type === "error" && "text-red-500",
         notification?.type === "success" && "text-green-500"
       )}
+      data-testid="text-notification"
     >
       {notification?.message}
     </div>
@@ -64,6 +65,7 @@ function AlertNotification({
         notification?.type === "error" && "bg-red-400",
         notification?.type === "success" && "bg-green-400"
       )}
+      data-testid="alert-notification"
     >
       <button
         type="button"

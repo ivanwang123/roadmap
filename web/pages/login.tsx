@@ -26,9 +26,7 @@ function Login() {
         <section className="col-start-2 col-end-7"></section>
         <section className="max-w-sm col-start-7 col-end-12">
           <div className="bg-secondary p-8 mt-8 rounded-sm">
-            <h1 className="text-3xl text-gray-800 font-medium tracking-wide mb-3">
-              Log in
-            </h1>
+            <h1 className="text-3xl text-black font-semibold mb-3">Log in</h1>
 
             <Form<LoginValues, typeof schema> onSubmit={login} schema={schema}>
               <>

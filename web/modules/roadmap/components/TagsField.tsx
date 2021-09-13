@@ -56,7 +56,7 @@ export function TagsField() {
           onChange={(e) => setTag(e.target.value)}
         >
           <span className="flex justify-center items-center ml-2">
-            <PrimaryButton onClick={appendTag}>
+            <PrimaryButton onClick={appendTag} data-testid="add-tag">
               <Add className="w-5 h-5 fill-current" />
             </PrimaryButton>
           </span>

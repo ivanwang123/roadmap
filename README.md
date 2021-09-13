@@ -28,16 +28,23 @@
 - Add continous integration
 - Split into microservices
 
+# TESTING
+
+- Cypress
+- Test /login and /register
+- Test /map/[id]
+- Test /create/map
+
 # PAGES
 
-/
-/explore
-/login - done
-/register - done
-/create/map
-/map/[id]
-/user/[id]
-/checkpoint/[id]?
+- /
+- /explore
+- /login
+- /register
+- /create/map
+- /map/[id]
+- /user/[id]
+- /checkpoint/[id]?
 
 # FEATURES
 

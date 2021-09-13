@@ -24,7 +24,7 @@ export function Checkpoint({ checkpoint, isAuth }: Props) {
 
   const handleUpdateStatus = (status: Status) => {
     if (isAuth) {
-      console.log("STATUESS", checkpoint.status, status);
+      console.log("STATUSES", checkpoint.status, status);
       const newStatus =
         checkpoint.status === status ? Status.Incomplete : status;
       console.log("CHECKPOINT ID", checkpoint.id, newStatus);
@@ -62,6 +62,7 @@ export function Checkpoint({ checkpoint, isAuth }: Props) {
                     : "hover:text-gray-400 hover:bg-gray-100"
                 )}
                 onClick={() => handleUpdateStatus(Status.Complete)}
+                data-testid="check-btn"
               >
                 <Check className="fill-current" width="100%" height="100%" />
               </button>

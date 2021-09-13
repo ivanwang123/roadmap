@@ -75,6 +75,7 @@ function Follow({ handleToggleFollow, followers }: ToggleFollowProps) {
       type="button"
       className="flex items-center bg-blue-200 text-sm tracking-wide rounded focus:outline-none"
       onClick={handleToggleFollow}
+      data-testid="follow-btn"
     >
       <div className="flex items-center bg-blue-300 text-blue-500 px-2 py-1 rounded-l">
         <User className="fill-current mr-1" width={14} height={14} />
@@ -96,6 +97,7 @@ function UnFollow({ handleToggleFollow, followers }: ToggleFollowProps) {
       type="button"
       className="flex items-center bg-secondary text-sm tracking-wide rounded-sm focus:outline-none"
       onClick={handleToggleFollow}
+      data-testid="unfollow-btn"
     >
       <div className="flex items-center bg-gray-200 text-gray-400 px-2 py-1 rounded-l">
         <User className="fill-current mr-1" width={14} height={14} />
