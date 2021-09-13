@@ -9,7 +9,7 @@
     "type-check": "tsc",
     "gql-codegen": "graphql-codegen --config codegen.yml",
     "cy:open": "cypress open",
-    "cy:run": "cypress run"
+    "cy:run": "cypress run --headless"
   },
   "dependencies": {
     "@apollo/client": "^3.4.8",
