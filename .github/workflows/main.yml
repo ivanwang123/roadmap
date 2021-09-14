@@ -11,7 +11,7 @@ jobs:
         with:
           go-version: "1.16"
       - name: Run go
-        run: go get github.com/99designs/gqlgen/cmd@v0.13.0 && go build cmd/roadmap/main.go && main
+        run: go mod tidy && go build cmd/roadmap/main.go && main
       - name: Cypress run
         uses: cypress-io/github-action@v2
         with:
