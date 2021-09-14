@@ -22,7 +22,7 @@ jobs:
       - name: Run go
         run: go mod tidy && go build cmd/roadmap/main.go && ./main &
       - name: Migrate go
-        run: psql -U postgres -d roadmap -f database/dev/1_schema.sql && psql -U postgres -d roadmap -f database/dev/2_data.sql
+        run: psql -h postgres -U postgres -d roadmap -f database/dev/1_schema.sql && psql -h postgres -U postgres -d roadmap -f database/dev/2_data.sql
       - name: Cypress run
         uses: cypress-io/github-action@v2
         with:
