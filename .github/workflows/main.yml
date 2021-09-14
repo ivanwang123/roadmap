@@ -9,8 +9,8 @@ jobs:
       - name: Cypress run
         uses: cypress-io/github-action@v2
         with:
-          working-directory: web
-          install: npm run install
-          build: npm run build
-          start: make air, npm start
+          # working-directory: web
+          install: npm --prefix ./web run install
+          build: npm --prefix ./web run build
+          start: make air, npm --prefix ./web start
           wait-on: "http://localhost:3000, http://localhost:8080"
