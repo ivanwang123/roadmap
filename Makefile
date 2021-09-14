@@ -1,4 +1,4 @@
-.PHONY: create up down force generate dataloader air mock
+.PHONY: create up down force generate dataloader air mock install-web build-web start-web
 
 create:
 	migrate create -ext sql -dir database/migrations/ -seq add_checkpoints
@@ -23,3 +23,12 @@ air:
 
 mock:
 	mockery --name=Repository --recursive --dir=internal/user --output=./tests/mocks --filename=user_repo_mock.go --structname=UserMockRepo
+
+install-web:
+	cd web && npm run install
+	
+build-web: 
+	cd web && npm run build
+
+start-web: 
+	cd web && npm start
