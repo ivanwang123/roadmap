@@ -39,8 +39,8 @@ jobs:
           build: npm run build
           start: npm start
           wait-on: "http://localhost:3000, http://localhost:8080"
-      - uses: actions/upload-artifact@v1
-        if: always()
-        with:
-          name: cypress-videos
-          path: cypress/videos
+          record: true
+          env:
+            CYPRESS_RECORD_KEY: fa96ea9b-13c5-484e-ad93-48cbd0edfcf0
+            GITHUB_TOKEN: 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
+            CYPRESS_PROJECT_ID: 2j28yv
