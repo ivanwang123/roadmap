@@ -40,7 +40,7 @@ jobs:
           start: npm start
           wait-on: "http://localhost:3000, http://localhost:8080"
           record: true
-          env:
-            CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
-            GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-            CYPRESS_PROJECT_ID: ${{ secrets.CYPRESS_PROJECT_ID }}
+        env:
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          CYPRESS_PROJECT_ID: ${{ secrets.CYPRESS_PROJECT_ID }}
