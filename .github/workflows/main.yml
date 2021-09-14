@@ -21,8 +21,16 @@ jobs:
           go-version: "1.16"
       - name: Run go
         run: go mod tidy && go build cmd/roadmap/main.go && ./main &
-      - name: Migrate go
-        run: psql -h postgres -U postgres -d roadmap -f database/dev/1_schema.sql && psql -h postgres -U postgres -d roadmap -f database/dev/2_data.sql
+      - name: Restore db
+        uses: tj-actions/pg-restore@v4.5
+        with:
+          database_url: "postgres://postgres:postgres@localhost:5432/roadmap"
+          backup_file: "database/dev/1_schema.sql"
+      - name: Restore db 2
+        uses: tj-actions/pg-restore@v4.5
+        with:
+          database_url: "postgres://postgres:postgres@localhost:5432/roadmap"
+          backup_file: "database/dev/2_data.sql"
       - name: Cypress run
         uses: cypress-io/github-action@v2
         with:
