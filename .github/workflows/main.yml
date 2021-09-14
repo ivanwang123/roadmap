@@ -3,6 +3,15 @@ on: [push]
 jobs:
   cypress-run:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:12
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: roadmap
+        ports:
+          - 5432:5432
     steps:
       - name: Checkout
         uses: actions/checkout@v2
