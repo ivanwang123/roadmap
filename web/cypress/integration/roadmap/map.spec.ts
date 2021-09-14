@@ -18,7 +18,6 @@ describe("Roadmap", () => {
 
   it("able to check checkpoint", () => {
     cy.visit("http://localhost:3000/map/1");
-    cy.get("[data-testid='follow-btn']").should("exist").click();
     cy.get("[data-testid='check-btn']").first().click();
     cy.get("[data-testid='check-btn']")
       .first()
