@@ -41,6 +41,6 @@ jobs:
           wait-on: "http://localhost:3000, http://localhost:8080"
           record: true
           env:
-            CYPRESS_RECORD_KEY: fa96ea9b-13c5-484e-ad93-48cbd0edfcf0
-            GITHUB_TOKEN: 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
-            CYPRESS_PROJECT_ID: 2j28yv
+            CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+            GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+            CYPRESS_PROJECT_ID: ${{ secrets.CYPRESS_PROJECT_ID }}
