@@ -9,7 +9,7 @@ describe("Roadmap", () => {
     });
   });
 
-  it.skip("able to toggle follow", () => {
+  it("able to toggle follow", () => {
     cy.visit("http://localhost:3000/map/1");
     cy.get("[data-testid='follow-btn']").should("exist").click();
     cy.get("[data-testid='unfollow-btn']").should("exist").click();
