@@ -10,6 +10,7 @@ jobs:
         uses: cypress-io/github-action@v2
         with:
           working-directory: web
+          install: npm run install
           build: cd web && npm run build
           start: make air, cd web && npm start
           wait-on: "http://localhost:3000, http://localhost:8080"
