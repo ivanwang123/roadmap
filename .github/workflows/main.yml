@@ -21,11 +21,11 @@ jobs:
           go-version: "1.16"
       - name: Run go
         run: go mod tidy && go build cmd/roadmap/main.go && ./main &
-      # - name: Cypress run
-      #   uses: cypress-io/github-action@v2
-      #   with:
-      #     working-directory: web
-      #     install: npm run install
-      #     build: npm run build
-      #     start: npm start
-      #     wait-on: "http://localhost:3000, http://localhost:8080"
+      - name: Cypress run
+        uses: cypress-io/github-action@v2
+        with:
+          working-directory: web
+          install: npm run install
+          build: npm run build
+          start: npm start
+          wait-on: "http://localhost:3000, http://localhost:8080"
