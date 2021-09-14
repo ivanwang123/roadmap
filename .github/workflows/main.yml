@@ -9,6 +9,7 @@ jobs:
       - name: Cypress run
         uses: cypress-io/github-action@v2
         with:
+          project: ./web
           build: cd web && npm run build
           start: make air, cd web && npm start
           wait-on: "http://localhost:3000, http://localhost:8080"
