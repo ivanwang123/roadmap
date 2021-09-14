@@ -11,6 +11,6 @@ jobs:
         with:
           working-directory: web
           install: npm run install
-          build: cd web && npm run build
-          start: make air, cd web && npm start
+          build: npm run build
+          start: make air, npm start
           wait-on: "http://localhost:3000, http://localhost:8080"
