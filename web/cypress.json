@@ -1,4 +1,5 @@
 {
   "projectId": "2j28yv",
-  "defaultCommandTimeout": 10000
+  "defaultCommandTimeout": 10000,
+  "videoUploadOnPasses": false
 }

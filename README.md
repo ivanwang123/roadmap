@@ -52,6 +52,8 @@
 - Integration testing
 - Server side rendering
 - Client side caching
+- Testing
+- CI/CD pipeline
 
 # TECHNOLOGIES
 
