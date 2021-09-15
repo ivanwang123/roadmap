@@ -65,7 +65,6 @@
 - GraphQL
 - GraphQL Code Generator
 - Cypress
-- Storybook
 - Docker
 
 - Go
