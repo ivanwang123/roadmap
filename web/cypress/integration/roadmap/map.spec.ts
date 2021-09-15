@@ -17,14 +17,14 @@ describe("Roadmap", () => {
     cy.get("[data-testid='unfollow-btn']").should("exist");
   });
 
-  // it("able to check checkpoint", () => {
-  //   cy.visit("http://localhost:3000/map/1");
-  //   cy.get("[data-testid='check-btn']").first().click();
-  //   cy.get("[data-testid='check-btn']")
-  //     .first()
-  //     .should("have.class", "text-emerald-600");
-  //   cy.get("[data-testid='check-svg']").should("exist");
-  //   cy.get("[data-testid='check-btn']").first().click();
-  //   cy.get("[data-testid='check-svg']").should("not.exist");
-  // });
+  it("able to check checkpoint", () => {
+    cy.visit("http://localhost:3000/map/1");
+    cy.get("[data-testid='check-btn']").first().click();
+    cy.get("[data-testid='check-btn']")
+      .first()
+      .should("have.class", "text-emerald-600");
+    cy.get("[data-testid='check-svg']").should("exist");
+    cy.get("[data-testid='check-btn']").first().click();
+    cy.get("[data-testid='check-svg']").should("not.exist");
+  });
 });
