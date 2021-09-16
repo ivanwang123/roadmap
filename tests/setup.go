@@ -3,6 +3,8 @@ package tests
 import (
 	"database/sql"
 	"log"
+	"path/filepath"
+	"runtime"
 
 	"github.com/go-testfixtures/testfixtures/v3"
 	"github.com/ivanwang123/roadmap/database"
@@ -26,14 +28,14 @@ func Setup() (*resolvers.Resolver, *testfixtures.Loader, *sqlx.DB) {
 	// TODO: Remove?
 	// db.SetMaxOpenConns(1)
 
-	// _, b, _, _ := runtime.Caller(0)
-	// basepath := filepath.Dir(b)
-	// fixturepath := filepath.Join(basepath, "fixtures")
+	_, b, _, _ := runtime.Caller(0)
+	basepath := filepath.Dir(b)
+	fixturepath := filepath.Join(basepath, "fixtures")
 
 	fixtures, err := testfixtures.New(
 		testfixtures.Database(db),
 		testfixtures.Dialect("postgresql"),
-		testfixtures.Directory("tests/fixtures"),
+		testfixtures.Directory(fixturepath),
 	)
 	if err != nil {
 		log.Fatalf("Failed to create fixtures: %s", err)
