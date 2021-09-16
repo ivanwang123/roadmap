@@ -24,7 +24,8 @@ import (
 const defaultPort = "8080"
 
 func main() {
-	db, err := database.ConnectDB("postgres://postgres:postgres@localhost/roadmap?sslmode=disable")
+	// db, err := database.ConnectDB("postgres://postgres:postgres@localhost/roadmap?sslmode=disable")
+	db, err := database.ConnectDB(os.Getenv("DB_STRING"))
 	if err != nil {
 		log.Fatal("Error connecting to database: ", err)
 	}
