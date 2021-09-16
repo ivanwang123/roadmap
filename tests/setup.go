@@ -3,8 +3,6 @@ package tests
 import (
 	"database/sql"
 	"log"
-	"path/filepath"
-	"runtime"
 
 	"github.com/go-testfixtures/testfixtures/v3"
 	"github.com/ivanwang123/roadmap/database"
@@ -21,7 +19,6 @@ import (
 )
 
 func Setup() (*resolvers.Resolver, *testfixtures.Loader, *sqlx.DB) {
-	// TODO: Use roadmap_test for ci/cd test
 	db, err := sql.Open("pgx", "postgres://postgres:postgres@localhost:5432/roadmap_test?sslmode=disable")
 	if err != nil {
 		log.Fatalf("Failed to open test database: %s", err)
@@ -29,14 +26,14 @@ func Setup() (*resolvers.Resolver, *testfixtures.Loader, *sqlx.DB) {
 	// TODO: Remove?
 	// db.SetMaxOpenConns(1)
 
-	_, b, _, _ := runtime.Caller(0)
-	basepath := filepath.Dir(b)
-	fixturepath := filepath.Join(basepath, "fixtures")
+	// _, b, _, _ := runtime.Caller(0)
+	// basepath := filepath.Dir(b)
+	// fixturepath := filepath.Join(basepath, "fixtures")
 
 	fixtures, err := testfixtures.New(
 		testfixtures.Database(db),
 		testfixtures.Dialect("postgresql"),
-		testfixtures.Directory(fixturepath),
+		testfixtures.Directory("tests/fixtures"),
 	)
 	if err != nil {
 		log.Fatalf("Failed to create fixtures: %s", err)
