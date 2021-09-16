@@ -1,1 +1,4 @@
-[]
+- user_id: 2
+  checkpoint_id: 1
+  roadmap_id: 1
+  status: "INCOMPLETE"
