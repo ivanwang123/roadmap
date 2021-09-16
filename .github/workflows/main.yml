@@ -21,13 +21,13 @@ jobs:
           go-version: "1.16"
       - name: Run go
         run: go mod tidy && go build cmd/roadmap/main.go && ./main &
-      - name: Test go
-        run: go mod tidy && go test ./internal/... -v
       - name: Restore db
         uses: tj-actions/pg-restore@v4.5
         with:
           database_url: "postgres://postgres:postgres@localhost:5432/roadmap_test"
           backup_file: "database/dev/1_schema.sql"
+      - name: Test go
+        run: go mod tidy && go test ./internal/... -v
       - name: Restore db 2
         uses: tj-actions/pg-restore@v4.5
         with:
