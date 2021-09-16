@@ -28,6 +28,8 @@ jobs:
         run: go mod tidy && go test ./internal/... -v
       - name: Run go
         run: go mod tidy && go build cmd/roadmap/main.go && ./main &
+        env:
+          DB_STRING: "postgres://postgres:postgres@localhost:5432/roadmap_test?sslmode=disable"
       - name: Restore db data
         uses: tj-actions/pg-restore@v4.5
         with:
@@ -45,4 +47,3 @@ jobs:
         env:
           CYPRESS_RECORD_KEY: fa96ea9b-13c5-484e-ad93-48cbd0edfcf0
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DB_STRING: "postgres://postgres:postgres@localhost:5432/roadmap_test?sslmode=disable"
