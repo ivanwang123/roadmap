@@ -19,10 +19,10 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: "1.16"
-      - name: Test go
-        run: go test ./internal/... -v
       - name: Run go
         run: go mod tidy && go build cmd/roadmap/main.go && ./main &
+      - name: Test go
+        run: go test ./internal/... -v
       - name: Restore db
         uses: tj-actions/pg-restore@v4.5
         with:
