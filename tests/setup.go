@@ -21,7 +21,8 @@ import (
 )
 
 func Setup() (*resolvers.Resolver, *testfixtures.Loader, *sqlx.DB) {
-	db, err := sql.Open("pgx", "dbname=roadmap password=postgres")
+	// TODO: Use roadmap_test for ci/cd test
+	db, err := sql.Open("pgx", "postgres://postgres:postgres@localhost:5432/roadmap?sslmode=disable")
 	if err != nil {
 		log.Fatalf("Failed to open test database: %s", err)
 	}
